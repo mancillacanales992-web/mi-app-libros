@@ -123,9 +123,9 @@
         /* --- CORRECCIÓN DEFINITIVA DE TAMAÑO --- */
         .book-cover {
             /* TAMAÑO FIJO Y PEQUEÑO */
-            height: 120px !important;  /* Forzamos la altura */
-            width: auto !important;    /* El ancho se ajusta solo */
-            max-width: 80px;           /* Tope máximo de ancho por si acaso */
+            height: 120px !important;  
+            width: auto !important;    
+            max-width: 80px;           
             
             aspect-ratio: 2/3;
             object-fit: cover;
@@ -133,7 +133,7 @@
             transform: rotateY(-12deg); transform-origin: left center;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.6); border-left: 2px solid rgba(255,255,255,0.3);
             background: #333; margin-bottom: 2px; transition: 0.3s;
-            margin: 0 auto; /* Centrado */
+            margin: 0 auto; 
         }
         
         .book-cover.generated {
@@ -486,13 +486,51 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    /* --- 2. ESTADO GLOBAL --- */
+    /* --- 2. SISTEMA DE BASE DE DATOS LOCAL (INDEXEDDB) --- */
+    // Esto soluciona el problema de "Pantalla Negra" guardando el PDF real
+    const DB_NAME = "BiblioApp_Files";
+    const DB_VERSION = 1;
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains("pdfs")) {
+                    db.createObjectStore("pdfs"); // Almacén simple clave-valor
+                }
+            };
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onerror = (e) => reject("Error DB");
+        });
+    }
+
+    async function savePDFToDevice(id, blob) {
+        const db = await openDB();
+        const tx = db.transaction("pdfs", "readwrite");
+        tx.objectStore("pdfs").put(blob, id);
+        return new Promise((resolve) => {
+            tx.oncomplete = () => resolve();
+        });
+    }
+
+    async function getPDFFromDevice(id) {
+        const db = await openDB();
+        const tx = db.transaction("pdfs", "readonly");
+        return new Promise((resolve, reject) => {
+            const req = tx.objectStore("pdfs").get(id);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject("No encontrado");
+        });
+    }
+
+    /* --- 3. ESTADO GLOBAL --- */
     let cloudBooks = []; 
-    let localFiles = JSON.parse(localStorage.getItem('my_local_files')) || [];
+    let localFiles = JSON.parse(localStorage.getItem('my_local_files_v2')) || [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
     let isAdminMode = false; 
 
-    /* --- 3. CONEXIÓN EN TIEMPO REAL (FIRESTORE) --- */
+    /* --- 4. CONEXIÓN FIREBASE --- */
     const q = query(collection(db, "libros"), orderBy("timestamp", "desc"));
     
     onSnapshot(q, (snapshot) => {
@@ -508,7 +546,7 @@
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
     }
 
-    /* --- 4. FUNCIONES GLOBALES (UI) --- */
+    /* --- 5. FUNCIONES DE UI --- */
     window.toggleDrawer = function() { 
         const d = document.getElementById('drawer');
         d.classList.toggle('open'); 
@@ -546,7 +584,7 @@
         renderLibrary('grid-nube', f);
     };
 
-    /* --- 5. MODALS Y FORMULARIOS --- */
+    /* --- 6. MODALS --- */
     window.handleGenericForm = function(event, title, msg) {
         event.preventDefault(); 
         showModal(title, msg);
@@ -563,7 +601,7 @@
         document.getElementById('success-modal').style.display = 'none';
     };
 
-    /* --- 6. MODO ADMINISTRADOR --- */
+    /* --- 7. MODO ADMIN --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
@@ -591,7 +629,7 @@
         }
     };
 
-    /* --- 7. SUBIDA A NUBE --- */
+    /* --- 8. SUBIDA NUBE --- */
     window.uploadBookToCloud = async function() {
         const title = document.getElementById('pubTitle').value;
         const author = document.getElementById('pubAuthor').value;
@@ -619,19 +657,32 @@
         }
     };
 
-    /* --- 8. IMPORTACIÓN MASIVA --- */
+    /* --- 9. IMPORTACIÓN MASIVA (CORREGIDA) --- */
     window.processMassImport = async function() {
-        const files = document.getElementById('impFile').files;
+        const fileInput = document.getElementById('impFile');
+        const files = fileInput.files; // Obtiene la lista completa
         const status = document.getElementById('import-status');
         
-        if (files.length === 0) { alert("Selecciona un PDF."); return; }
+        if (!files || files.length === 0) { 
+            alert("⚠️ Selecciona al menos un PDF."); 
+            return; 
+        }
 
         status.innerText = `Procesando ${files.length} archivos...`;
 
+        // Iterar sobre TODOS los archivos seleccionados
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            const uniqueID = "local_" + Date.now() + "_" + i; // ID único para DB
+
             try {
                 const arrayBuffer = await file.arrayBuffer();
+                
+                // 1. Guardar el PDF real en IndexedDB (Solución pantalla negra)
+                const blob = new Blob([arrayBuffer], {type: "application/pdf"});
+                await savePDFToDevice(uniqueID, blob);
+
+                // 2. Generar Portada
                 const pdf = await pdfjsLib.getDocument(new Uint8Array(arrayBuffer)).promise;
                 const page = await pdf.getPage(1);
                 
@@ -644,26 +695,30 @@
                 await page.render({ canvasContext: ctx, viewport: viewport }).promise;
                 const coverData = canvas.toDataURL('image/jpeg', 0.8);
 
+                // 3. Guardar Metadatos en LocalStorage
                 localFiles.push({
+                    id: uniqueID, // Referencia al archivo en IndexedDB
                     title: file.name.replace('.pdf', ''),
-                    author: "Local",
+                    author: "Archivo Local",
                     cover: coverData,
-                    type: 'local',
-                    pdfData: null 
+                    type: 'local'
                 });
+
             } catch (err) {
-                console.error("Error: " + file.name, err);
+                console.error("Error importando " + file.name, err);
             }
         }
 
-        localStorage.setItem('my_local_files', JSON.stringify(localFiles));
+        // Guardar lista de metadatos
+        localStorage.setItem('my_local_files_v2', JSON.stringify(localFiles));
+        
         status.innerText = "";
-        showModal("Importado", `${files.length} libros guardados.`);
-        document.getElementById('impFile').value = ""; 
+        showModal("Importación Completa", `${files.length} libros guardados y listos para leer.`);
+        fileInput.value = ""; 
         window.navigate('misarchivos');
     };
 
-    /* --- 9. RENDERIZADO (CON AJUSTE DE TAMAÑO APLICADO) --- */
+    /* --- 10. RENDERIZADO (TAMAÑO PEQUEÑO FORZADO) --- */
     function renderLibrary(id, books) {
         const c = document.getElementById(id); 
         c.innerHTML = '';
@@ -673,17 +728,15 @@
             return; 
         }
         
-        // Loop de 3 en 3 para estantes
         for(let i=0; i<books.length; i+=3) {
             books.slice(i, i+3).forEach(b => {
                 const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
                 const div = document.createElement('div'); 
                 div.className = 'book-wrapper';
                 
-                // Generación de Portada (Respetando CSS de Part 1)
                 let coverHtml = '';
                 if (b.cover && b.cover.trim() !== "") {
-                    // La clase .book-cover en CSS ya tiene height:120px fijo
+                    // La clase CSS .book-cover ya fuerza el tamaño pequeño
                     coverHtml = `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">`;
                 } else {
                     coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);">
@@ -741,80 +794,43 @@
         localStorage.setItem('my_fav_books', JSON.stringify(favorites));
     }
 
-    /* --- 10. MANEJO DE CLIC --- */
-    function handleBookClick(book) {
+    /* --- 11. MANEJO DE CLIC Y LECTURA --- */
+    async function handleBookClick(book) {
+        // A) LIBRO NUBE -> Link Externo
         if (book.type === 'cloud' && book.pdfLink) {
-            window.open(book.pdfLink, '_blank'); // Abre directo
+            window.open(book.pdfLink, '_blank');
             return; 
         }
 
-        const overlay = document.getElementById('download-overlay');
-        const bar = document.getElementById('progress-fill');
-        const txt = document.getElementById('progress-text');
-        
-        overlay.style.display = 'flex';
-        document.getElementById('download-text').innerText = "Abriendo...";
-        bar.style.width = "0%";
-        
-        let width = 0;
-        const interval = setInterval(() => {
-            width += 15; 
-            if (width >= 100) {
-                clearInterval(interval);
-                setTimeout(() => {
+        // B) LIBRO LOCAL -> Abrir desde IndexedDB (Solución Pantalla Negra)
+        if (book.type === 'local') {
+            const overlay = document.getElementById('download-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('download-text').innerText = "Abriendo PDF...";
+            document.getElementById('progress-fill').style.width = "50%";
+
+            try {
+                // Recuperar archivo real
+                const pdfBlob = await getPDFFromDevice(book.id);
+                if (!pdfBlob) {
+                    alert("❌ Error: El archivo no se encuentra en el dispositivo.");
                     overlay.style.display = 'none';
-                    openReader(book);
-                }, 300);
-            } else {
-                bar.style.width = width + "%";
-                txt.innerText = width + "%";
+                    return;
+                }
+                
+                // Crear URL temporal y abrir
+                const fileURL = URL.createObjectURL(pdfBlob);
+                overlay.style.display = 'none';
+                
+                // Abrir en nueva pestaña (mejor visor nativo de Android/iOS)
+                window.open(fileURL, '_blank');
+
+            } catch (e) {
+                console.error(e);
+                alert("Error al abrir el libro local.");
+                overlay.style.display = 'none';
             }
-        }, 50);
-    }
-
-    /* --- 11. LECTOR --- */
-    let currentBookPages = 0;
-    let currentPageIndex = 0;
-    let touchStartX = 0;
-
-    window.openReader = function(book) {
-        const overlay = document.getElementById('reader-overlay');
-        const container = document.getElementById('book3d');
-        
-        overlay.style.display = 'block'; 
-        container.innerHTML = ''; 
-        currentPageIndex = 0;
-
-        container.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, {passive: false});
-        container.addEventListener('touchend', e => {
-            const diff = e.changedTouches[0].clientX - touchStartX;
-            if (diff < -50 && currentPageIndex < currentBookPages - 1) { 
-                document.getElementById('page-' + currentPageIndex).classList.add('flipped');
-                currentPageIndex++;
-            } else if (diff > 50 && currentPageIndex > 0) { 
-                document.getElementById('page-' + (currentPageIndex - 1)).classList.remove('flipped');
-                currentPageIndex--;
-            }
-        });
-
-        let coverImg = book.cover || "https://via.placeholder.com/300x450?text=" + encodeURIComponent(book.title);
-        createPage(container, 0, `<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">`);
-        createPage(container, 1, `<h3 style="color:var(--accent);">${book.title}</h3><p>${book.author}</p>`);
-        createPage(container, 2, `<div style="text-align:center; margin-top:50%">Fin</div>`);
-        currentBookPages = 3;
-    };
-
-    window.closeReader = function() { 
-        document.getElementById('reader-overlay').style.display = 'none'; 
-    };
-
-    function createPage(container, index, content) {
-        const page = document.createElement('div');
-        page.className = 'page';
-        page.id = 'page-' + index;
-        page.style.zIndex = 100 - index;
-        page.innerHTML = `<div class="page-content">${content}</div>`;
-        container.appendChild(page);
+        }
     }
 
     renderLibrary('grid-local', localFiles);
