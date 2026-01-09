@@ -10,13 +10,10 @@
     </script>
 
     <style>
-        /* --- 1. AJUSTES CRÍTICOS DE COMPORTAMIENTO --- */
-        html, body {
-            overscroll-behavior-y: contain; /* Bloquea Pull-to-Refresh */
-            touch-action: pan-x pan-y;
-        }
+        /* --- MEJORA UX: Bloqueo de Pull-to-Refresh --- */
+        html, body { overscroll-behavior-y: contain; }
 
-        /* --- 2. SISTEMA DE TEMAS --- */
+        /* --- 1. SISTEMA DE TEMAS (Originales) --- */
         :root {
             --bg-wall: #1e1e24; 
             --brick-1: #25252d; --brick-2: #2b2b36;
@@ -25,9 +22,7 @@
             --header-bg: rgba(30, 30, 36, 0.98);
             --text-main: #f0f0f0; --text-muted: #b0b0b0;
             --accent: #00e5ff; --accent-glow: rgba(0, 229, 255, 0.25);
-            --success: #00ff88;
         }
-        /* Temas adicionales */
         body.theme-orange { --bg-wall: #1a1008; --brick-1: #26170b; --brick-2: #331f0e; --ui-bg: rgba(255, 140, 0, 0.08); --ui-border: rgba(255, 140, 0, 0.3); --header-bg: rgba(26, 16, 8, 0.98); --text-main: #fff0e0; --text-muted: #d0b0a0; --accent: #ff6d00; --accent-glow: rgba(255, 109, 0, 0.4); }
         body.theme-silver { --bg-wall: #212121; --brick-1: #2c2c2c; --brick-2: #383838; --ui-bg: rgba(200, 200, 200, 0.08); --ui-border: rgba(200, 200, 200, 0.2); --header-bg: rgba(33, 33, 33, 0.98); --text-main: #ffffff; --text-muted: #9e9e9e; --accent: #b0bec5; --accent-glow: rgba(176, 190, 197, 0.3); }
         body.theme-red { --bg-wall: #1a0505; --brick-1: #290a0a; --brick-2: #380e0e; --ui-bg: rgba(255, 50, 50, 0.08); --ui-border: rgba(255, 82, 82, 0.3); --header-bg: rgba(26, 5, 5, 0.98); --text-main: #ffebee; --text-muted: #e57373; --accent: #ff1744; --accent-glow: rgba(255, 23, 68, 0.4); }
@@ -125,11 +120,11 @@
             border: 1px solid rgba(255,255,255,0.15); transform: translateZ(20px);
         }
 
-        /* --- CORRECCIÓN VISUAL CRÍTICA: PORTADAS UNIFORMES --- */
+        /* --- CORRECCIÓN DE TAMAÑO (COMO EL EJEMPLO) --- */
         .book-cover {
-            width: 100%; 
-            aspect-ratio: 2/3; /* OBLIGATORIO: Rectángulo Vertical */
-            object-fit: cover; /* OBLIGATORIO: Recorta sin deformar */
+            width: 80%; /* AJUSTADO: Más pequeño (como tu imagen original) */
+            aspect-ratio: 2/3; /* Mantiene forma rectangular perfecta */
+            object-fit: cover;
             border-radius: 2px;
             transform: rotateY(-12deg); transform-origin: left center;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.6); border-left: 2px solid rgba(255,255,255,0.3);
@@ -139,24 +134,23 @@
         .book-cover.generated {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 10px; text-align: center; font-size: 12px; color: white;
-            box-sizing: border-box; /* Asegura que el padding no rompa el tamaño */
+            background: linear-gradient(45deg, #333, #555);
         }
 
         .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
 
-        /* Icono de borrado (Admin) */
         .delete-icon {
-            position: absolute; top: -5px; right: -5px; width: 24px; height: 24px;
+            position: absolute; top: -5px; right: -5px; width: 20px; height: 20px;
             background: #ff1744; color: white; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; z-index: 50;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 2px solid white;
-            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid white;
+            font-size: 12px;
         }
 
-        /* --- MODAL DE ÉXITO (Reemplazo de alertas) --- */
+        /* --- MODALS --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 8000; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center;
             backdrop-filter: blur(5px);
         }
         .modal-content {
@@ -164,10 +158,9 @@
             padding: 30px; text-align: center; max-width: 300px; animation: popIn 0.3s;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
-        .modal-icon-success { font-size: 50px; margin-bottom: 15px; display: block; }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* --- LECTOR & PÁGINAS --- */
+        /* --- LECTOR --- */
         #reader-overlay { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-wall); z-index: 5000; overflow: hidden; }
         .book-3d { width: 100%; height: 100%; position: relative; overflow: hidden; touch-action: pan-y; }
         .page { 
@@ -200,7 +193,8 @@
         .drawer.open { left: 0; }
         .drawer-header { background: rgba(0,0,0,0.2); padding: 30px 20px; border-bottom: 1px solid var(--ui-border); }
         .drawer-item { padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 15px; align-items: center; color: var(--text-muted); }
-        
+        .drawer-item svg { fill: var(--text-muted); } .drawer-item:active svg { fill: var(--accent); }
+
         .bottom-bar {
             position: fixed; bottom: 0; width: 100%; background: var(--header-bg); height: 60px;
             display: flex; justify-content: space-around; align-items: center;
@@ -222,10 +216,10 @@
 
 <div id="success-modal" class="modal-overlay">
     <div class="modal-content">
-        <span class="modal-icon-success">✨</span>
+        <div style="font-size:40px; margin-bottom:10px">✨</div>
         <h3 id="modal-title" style="color:var(--text-main); margin:0 0 10px 0;">¡Éxito!</h3>
-        <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Operación realizada.</p>
-        <button class="btn-neon" onclick="closeModal()">ENTENDIDO</button>
+        <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Tu solicitud ha sido enviada.</p>
+        <button class="btn-neon" onclick="closeModal()">CERRAR</button>
     </div>
 </div>
 
@@ -294,6 +288,8 @@
     <div id="configuracion" class="page-section">
         <div class="glass-panel">
             <h2 style="margin-top:0; color:var(--accent); text-align:center"> Atmósfera de Lectura</h2>
+            <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:20px">Selecciona un tema visual para la biblioteca:</p>
+            
             <div class="theme-grid">
                 <div class="theme-card active" onclick="changeTheme('default', this)"><div class="theme-preview-circle" style="background:#1e1e24; border-color:#555"></div><div class="theme-name">Dark Slate</div></div>
                 <div class="theme-card" onclick="changeTheme('orange', this)"><div class="theme-preview-circle" style="background:#1a1008; border-color:#ff6d00"></div><div class="theme-name">Energetic Orange</div></div>
@@ -304,34 +300,45 @@
                 <div class="theme-card" onclick="changeTheme('purple', this)"><div class="theme-preview-circle" style="background:#12051a; border-color:#d500f9;"></div><div class="theme-name">Deep Purple</div></div>
                 <div class="theme-card" onclick="changeTheme('gold', this)"><div class="theme-preview-circle" style="background:#141005; border-color:#ffca28;"></div><div class="theme-name">Luxury Gold</div></div>
             </div>
-            <div style="text-align:center; margin-top:20px;">
-                <button onclick="toggleAdminMode()" style="background:none; border:none; color:var(--text-muted); font-size:10px; opacity:0.3; cursor:pointer;">Admin Mode</button>
+            
+            <div style="text-align:center; margin-top:20px; opacity:0.3">
+                <button onclick="toggleAdminMode()" style="background:none; border:none; color:var(--text-muted); font-size:10px;">Admin</button>
             </div>
         </div>
     </div>
 
     <div id="importar" class="page-section">
         <div class="glass-panel" style="text-align:center">
-            <h3 style="color:var(--accent)">📂 Importación Masiva</h3>
-            <p style="font-size:13px; color:var(--text-muted)">Selecciona uno o más PDFs. Las portadas se generarán automáticamente.</p>
+            <h3 style="color:var(--accent)">📂 Archivos Locales</h3>
+            <p style="font-size:13px; color:var(--text-muted)">Carga tus PDFs. <b>La portada se generará automáticamente.</b></p>
             
             <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">ARCHIVOS (PDF)</label>
             <input type="file" id="impFile" accept=".pdf" multiple class="input-box" style="padding:10px">
             
-            <button class="btn-neon" onclick="processMassImport()">IMPORTAR ARCHIVOS</button>
-            <p id="import-status" style="font-size:11px; margin-top:10px; color:var(--text-main)"></p>
+            <button class="btn-neon" onclick="processMassImport()">GUARDAR EN DISPOSITIVO</button>
+            <p id="import-status" style="font-size:11px; margin-top:5px; color:var(--text-main)"></p>
         </div>
     </div>
 
     <div id="publicar" class="page-section">
         <div class="glass-panel">
             <h2 style="color:var(--accent);margin-top:0;"> Subir a la Nube</h2>
-            <form id="publishForm" onsubmit="event.preventDefault(); uploadBookToCloud();">
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px">Agrega un libro a la base de datos pública.</p>
+            
+            <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'El libro está disponible para todos.')">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">TÍTULO</label>
                 <input type="text" id="pubTitle" class="input-box" required placeholder="Título del libro">
+                
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">AUTOR</label>
                 <input type="text" id="pubAuthor" class="input-box" required placeholder="Nombre del Autor">
-                <input type="url" id="pubLink" class="input-box" required placeholder="Link PDF (Drive/Dropbox)">
-                <input type="url" id="pubCover" class="input-box" placeholder="Link Portada (Opcional)">
-                <button type="submit" class="btn-neon filled">PUBLICAR AHORA</button>
+                
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PDF (Google Drive/Dropbox)</label>
+                <input type="url" id="pubLink" class="input-box" required placeholder="https://...">
+
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PORTADA (Opcional)</label>
+                <input type="url" id="pubCover" class="input-box" placeholder="https://... (Si está vacío, se genera sola)">
+                
+                <button type="button" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR AHORA</button>
             </form>
         </div>
     </div>
@@ -339,6 +346,7 @@
     <div id="donacion" class="page-section">
         <div class="glass-panel" style="text-align:center">
             <h2 style="color:#ffcc00; text-shadow:0 0 15px rgba(255,215,0,0.6)">Donaciones</h2>
+            <p style="font-size:14px; color:var(--text-muted)">Tu apoyo mantiene los servidores activos y la verdad al alcance de todos.</p>
             <div style="font-size:50px; margin:20px 0; animation: float 3s ease-in-out infinite;">🤝</div>
             <button class="btn-neon" style="background:rgba(255,204,0,0.1); border-color:#ffcc00; color:#ffcc00" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=5YA3A93HWYMRA','_blank')">❤️ Donar con PayPal</button>
         </div>
@@ -347,7 +355,9 @@
     <div id="pedir" class="page-section">
         <div class="glass-panel">
             <h2 style="color:var(--accent)">Solicitar Libro</h2>
-            <form id="requestForm" onsubmit="handleGenericForm(event, 'Solicitud enviada', 'Haremos lo posible por conseguirlo.')">
+            <p style="font-size:12px; color:var(--text-muted)">Haremos lo posible por conseguirlo.</p>
+            
+            <form onsubmit="handleGenericForm(event, 'Solicitud Enviada', '¡Gracias! Buscaremos el libro.')">
                 <input type="text" name="libro" class="input-box" placeholder="Nombre del Libro" required>
                 <input type="text" name="autor" class="input-box" placeholder="Autor (Opcional)">
                 <button type="submit" class="btn-neon">ENVIAR PEDIDO</button>
@@ -357,32 +367,104 @@
 
     <div id="ayuda" class="page-section">
         <div class="glass-panel">
-            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); font-size:18px; text-align:center;">PREGUNTAS FRECUENTES</h2>
-            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Importar mis archivos?</summary>
-                <p style="font-size:13px; margin-top:10px; color:var(--text-muted);">Sí, usa la sección "Importar". Soportamos carga múltiple y generamos portadas automáticamente.</p>
-            </details>
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); letter-spacing:1px; font-size:18px; text-align:center; width:100%">PREGUNTAS FRECUENTES</h2>
             
-            <h2 style="color:var(--accent); font-size:16px; margin-top:30px">REPORTE Y GESTIÓN</h2>
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Esta biblioteca es totalmente gratuita?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí, el acceso a la lectura y descarga de materiales en PDF y ePub es gratuito. Nuestro propósito es facilitar el acceso a la literatura cristiana para edificación de todos. Sin embargo, creemos firmemente que "el obrero es digno de su salario" (1 Timoteo 5:18). Por ello, recomendamos encarecidamente que, si tienes la solvencia económica, compres el libro directamente a su autor o en su tienda oficial para bendecir su ministerio.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Por qué hay publicidad en la aplicación y el sitio web?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    La publicidad nos permite mantener la plataforma en línea, cubrir los costos de servidores, almacenamiento y mantenimiento técnico para que el servicio siga estando disponible para todos, especialmente para aquellos que no tienen recursos para adquirir libros.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ Si hago una donación, ¿se elimina la publicidad?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    No. Hemos decidido mantener la publicidad general para sostener la infraestructura técnica básica. Las donaciones tienen un propósito diferente y más noble: se utilizan para apoyar económicamente a los autores independientes dentro de nuestra plataforma y para adquirir legalmente nuevos libros y licencias para ampliar la biblioteca comunitaria.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿A dónde va el dinero de los ingresos y donaciones?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Operamos bajo un modelo de transparencia y mayordomía. Los fondos se distribuyen de la siguiente manera:<br>
+                    • Mantenimiento técnico de la web y la app.<br>
+                    • Un porcentaje se destina como beneficio directo a los autores asociados.<br>
+                    • Compra de nuevo material bibliográfico para ponerlo a disposición de los usuarios.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Puedo importar mis propios archivos a la aplicación?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí. Nuestra app cuenta con una función de "Importar Archivos" que te permite cargar tus propios PDF y ePubs para que puedas usar nuestra plataforma como tu lector personal y tener toda tu biblioteca organizada en un solo lugar.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Qué hago si encuentro un libro que infringe derechos de autor?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Respetamos profundamente la propiedad intelectual y el trabajo de los escritores cristianos. Si eres el autor o representante legal de una obra y deseas que sea retirada o gestionar sus derechos, por favor utiliza nuestro Formulario de Reporte. Atenderemos tu solicitud a la brevedad posible para actuar conforme a la ley y a la ética cristiana.
+                </p>
+            </details>
+
+            <br>
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); font-size:16px;"> REPORTE Y GESTIÓN</h2>
+            <p style="font-size:11px; margin-bottom:20px; color:var(--text-muted); text-align:center">Para errores técnicos, enlaces rotos o gestión de derechos de autor.</p>
+
             <form onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos tu caso a la brevedad.')">
-                <input type="text" class="input-box" placeholder="Nombre Completo" required>
-                <input type="email" class="input-box" placeholder="Email" required>
-                <input type="text" class="input-box" placeholder="Título del Libro / URL" required>
-                <textarea class="input-box" rows="4" placeholder="Detalles..."></textarea>
-                <button type="submit" class="btn-neon filled">ENVIAR REPORTE</button>
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">1. DATOS DE CONTACTO</div>
+                <input type="text" name="nombre" class="input-box" placeholder="Nombre Completo" required>
+                <input type="email" name="email" class="input-box" placeholder="Email" required>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">2. DETALLES</div>
+                <input type="text" name="recurso" class="input-box" placeholder="Título del Libro / URL" required>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">3. MOTIVO</div>
+                <select name="motivo" class="input-box" style="background:#222; color:white">
+                    <option>Infracción Derechos de Autor</option>
+                    <option>Archivo Dañado</option>
+                    <option>Información Incorrecta</option>
+                    <option>Contenido Inapropiado</option>
+                    <option>Otro</option>
+                </select>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">4. MENSAJE / PRUEBAS</div>
+                <textarea name="mensaje" class="input-box" rows="4" placeholder="Detalles adicionales..."></textarea>
+
+                <label style="display:flex; gap:10px; font-size:11px; color:var(--text-muted); align-items:flex-start; margin-top:10px">
+                    <input type="checkbox" required>
+                    <span>Declaro que la información es verídica. Reportes falsos perjudican a la comunidad.</span>
+                </label>
+
+                <button type="submit" class="btn-neon filled" style="margin-top:20px">ENVIAR REPORTE</button>
             </form>
         </div>
     </div>
 </main>
 
 <footer class="bottom-bar">
-    <button class="nav-item" onclick="navigate('recientes')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio</button>
-    <button class="nav-item" onclick="navigate('favoritos')"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Favoritos</button>
-    <button class="nav-item" onclick="navigate('ayuda')"><svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda</button>
+    <button class="nav-item" onclick="navigate('recientes')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio
+    </button>
+    <button class="nav-item" onclick="navigate('favoritos')">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Favoritos
+    </button>
+    <button class="nav-item" onclick="window.open('https://youtube.com/@verdadesenm?si=JgKmzs7HcQtSTBVg','_blank')">
+        <svg viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg> Canal
+    </button>
+    <button class="nav-item" onclick="navigate('ayuda')">
+        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda
+    </button>
 </footer>
-
 <script type="module">
-    /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
+    /* --- 1. CONFIGURACIÓN DE FIREBASE (ORIGINAL + deleteDoc para Admin) --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
@@ -395,6 +477,7 @@
         appId: "1:737226922744:web:8746608081fef3355ff90d"
     };
 
+    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -402,25 +485,28 @@
     let cloudBooks = []; 
     let localFiles = JSON.parse(localStorage.getItem('my_local_files')) || [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
-    let isAdminMode = false; // Estado del modo administrador
+    let isAdminMode = false; // Estado para el modo administrador
 
     /* --- 3. CONEXIÓN EN TIEMPO REAL (FIRESTORE) --- */
     const q = query(collection(db, "libros"), orderBy("timestamp", "desc"));
     
     onSnapshot(q, (snapshot) => {
-        cloudBooks = [];
+        cloudBooks = []; 
         snapshot.forEach((docSnap) => {
+            // Guardamos el ID del documento para poder borrarlo si somos admin
             cloudBooks.push({ id: docSnap.id, ...docSnap.data(), type: 'cloud' });
         });
-        refreshActiveViews();
+        
+        // Refrescar vistas si están activas
+        refreshActiveView();
     });
 
-    function refreshActiveViews() {
+    function refreshActiveView() {
         if(document.getElementById('recientes').classList.contains('active')) renderLibrary('grid-recientes', cloudBooks);
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
     }
 
-    /* --- 4. FUNCIONES GLOBALES (UI & NAVEGACIÓN) --- */
+    /* --- 4. FUNCIONES GLOBALES DE INTERFAZ --- */
     window.toggleDrawer = function() { 
         const d = document.getElementById('drawer');
         d.classList.toggle('open'); 
@@ -437,6 +523,7 @@
         const tab = document.getElementById('tab-' + id); 
         if(tab) tab.classList.add('active');
         
+        // Renderizar la grilla correcta
         if(id === 'favoritos') renderLibrary('grid-favoritos', favorites);
         if(id === 'misarchivos') renderLibrary('grid-local', localFiles);
         if(id === 'recientes' || id === 'nube') {
@@ -458,11 +545,11 @@
         renderLibrary('grid-nube', f);
     };
 
-    /* --- 5. MODALS Y FORMULARIOS (NO REDIRECTION) --- */
+    /* --- 5. NUEVO: MANEJO DE MODALS (Sin Redirección) --- */
     window.handleGenericForm = function(event, title, msg) {
-        event.preventDefault(); // Detiene el envío real
+        event.preventDefault(); // Detiene la recarga/redirección
         showModal(title, msg);
-        event.target.reset(); // Limpia el formulario
+        event.target.reset(); // Limpia los campos
     };
 
     window.showModal = function(title, msg) {
@@ -475,20 +562,20 @@
         document.getElementById('success-modal').style.display = 'none';
     };
 
-    /* --- 6. MODO ADMINISTRADOR (NUEVO) --- */
+    /* --- 6. NUEVO: MODO ADMINISTRADOR --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
             alert("Modo Admin DESACTIVADO");
-            refreshActiveViews();
+            refreshActiveView();
             return;
         }
         
         const pass = prompt("🔒 Ingrese contraseña de Administrador:");
-        if (pass === 'admin123') {
+        if (pass === 'admin123') { // Contraseña simple solicitada
             isAdminMode = true;
-            alert("✅ MODO ADMIN ACTIVADO: Ahora verás iconos de borrar.");
-            refreshActiveViews();
+            alert("✅ MODO ADMIN ACTIVADO: Ahora verás iconos de papelera roja.");
+            refreshActiveView();
         } else {
             alert("⛔ Contraseña incorrecta.");
         }
@@ -500,17 +587,23 @@
         try {
             await deleteDoc(doc(db, "libros", docId));
             showModal("Eliminado", "El libro ha sido borrado de la base de datos.");
+            // La vista se actualiza sola gracias a onSnapshot
         } catch (e) {
             alert("Error: " + e.message);
         }
     };
 
-    /* --- 7. SUBIDA A NUBE --- */
+    /* --- 7. SUBIDA A NUBE (Modificado para usar Modal) --- */
     window.uploadBookToCloud = async function() {
         const title = document.getElementById('pubTitle').value;
         const author = document.getElementById('pubAuthor').value;
         const link = document.getElementById('pubLink').value;
         const cover = document.getElementById('pubCover').value;
+
+        if(!title || !author || !link) {
+            alert("⚠️ Faltan datos obligatorios.");
+            return;
+        }
 
         const btn = document.querySelector('#publishForm .btn-neon');
         const originalText = btn.innerText;
@@ -519,69 +612,90 @@
 
         try {
             await addDoc(collection(db, "libros"), {
-                title: title, author: author, pdfLink: link, cover: cover,
+                title: title,
+                author: author,
+                pdfLink: link,
+                cover: cover,
                 timestamp: serverTimestamp()
             });
-            showModal("¡Publicado!", "El libro ya está disponible en la nube para todos.");
+            
+            showModal("¡Publicado!", "Libro agregado exitosamente a la Nube.");
             document.getElementById('publishForm').reset();
             window.navigate('recientes');
+
         } catch (e) {
-            alert("Error: " + e.message);
+            console.error("Error subiendo: ", e);
+            alert("❌ Error al subir: " + e.message);
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
         }
     };
 
-    /* --- 8. IMPORTACIÓN MASIVA (NUEVO) --- */
+    /* --- 8. NUEVO: IMPORTACIÓN MASIVA (Multi-archivo) --- */
     window.processMassImport = async function() {
-        const files = document.getElementById('impFile').files;
+        // Obtenemos la lista de archivos (FileList)
+        const fileInput = document.getElementById('impFile');
+        const files = fileInput.files;
         const status = document.getElementById('import-status');
         
-        if (files.length === 0) { alert("Selecciona al menos un archivo."); return; }
+        if (files.length === 0) {
+            alert("⚠️ Selecciona al menos un archivo PDF.");
+            return;
+        }
 
-        status.innerText = `Procesando ${files.length} archivos...`;
+        status.innerText = `Procesando ${files.length} archivos... Por favor espera.`;
 
+        // Iteramos sobre cada archivo seleccionado
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            
             try {
-                // Generar portada
+                // 1. Leer archivo
                 const arrayBuffer = await file.arrayBuffer();
+                
+                // 2. Generar Portada con PDF.js
                 const pdf = await pdfjsLib.getDocument(new Uint8Array(arrayBuffer)).promise;
                 const page = await pdf.getPage(1);
                 
                 const viewport = page.getViewport({ scale: 0.5 });
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                const context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                
-                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-                const coverData = canvas.toDataURL('image/jpeg', 0.8);
 
-                // Guardar
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                const coverDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+                // 3. Guardar en LocalStorage
+                // Usamos el nombre del archivo como título provisional si se suben muchos
                 const cleanTitle = file.name.replace('.pdf', '');
-                localFiles.push({
+                
+                const newBook = {
                     title: cleanTitle,
                     author: "Archivo Local",
-                    cover: coverData,
+                    cover: coverDataUrl,
                     type: 'local',
-                    pdfData: null // No guardamos data pesada
-                });
+                    pdfData: null 
+                };
 
-            } catch (err) {
-                console.error("Error importando " + file.name, err);
+                localFiles.push(newBook);
+
+            } catch (error) {
+                console.error("Error importando " + file.name, error);
             }
         }
 
+        // Guardar array completo
         localStorage.setItem('my_local_files', JSON.stringify(localFiles));
+        
         status.innerText = "";
         showModal("Importación Completa", `Se han guardado ${files.length} libros en tu dispositivo.`);
-        document.getElementById('impFile').value = ""; // Reset input
+        fileInput.value = ""; // Reset input
         window.navigate('misarchivos');
     };
 
-    /* --- 9. RENDERIZADO UNIFICADO --- */
+    /* --- 9. RENDERIZADO DE BIBLIOTECA (Con Icono Admin y Portadas Corregidas) --- */
     function renderLibrary(id, books) {
         const c = document.getElementById(id); 
         c.innerHTML = '';
@@ -591,16 +705,16 @@
             return; 
         }
         
-        // Renderizar estanterías
         for(let i=0; i<books.length; i+=3) {
             books.slice(i, i+3).forEach(b => {
-                const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
+                const fav = favorites.some(f => f.title === b.title) ? 'active' : '';
                 const div = document.createElement('div'); 
                 div.className = 'book-wrapper';
                 
-                // Generar Portada si no existe
+                // Lógica de Portada
                 let coverHtml = '';
                 if (b.cover && b.cover.trim() !== "") {
+                    // Importante: La clase .book-cover en CSS ya tiene el width 80%
                     coverHtml = `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">`;
                 } else {
                     coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);">
@@ -608,7 +722,7 @@
                     </div>`;
                 }
 
-                // Botón Eliminar (Solo Admin + Nube)
+                // Botón de Borrado (Solo si Admin + Libro de Nube)
                 let deleteBtn = '';
                 if (isAdminMode && b.type === 'cloud') {
                     deleteBtn = `<div class="delete-icon" onclick="event.stopPropagation(); deleteCloudBook('${b.id}')">🗑️</div>`;
@@ -617,7 +731,7 @@
                 div.innerHTML = `
                     <div class="book-title">${b.title}</div>
                     ${deleteBtn}
-                    <svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24">
+                    <svg class="fav-heart ${fav}" width="20" height="20" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                     ${coverHtml}
@@ -625,7 +739,7 @@
                 
                 div.querySelector('.fav-heart').onclick = (e) => {
                     e.stopPropagation();
-                    toggleFav(b, e.target.closest('.fav-heart'));
+                    window.toggleFav(b, e.target.closest('.fav-heart'));
                 };
 
                 div.onclick = () => handleBookClick(b); 
@@ -646,7 +760,7 @@
         return color;
     }
 
-    function toggleFav(b, el) {
+    window.toggleFav = function(b, el) {
         const idx = favorites.findIndex(f => f.title === b.title);
         if(idx === -1) { 
             favorites.push(b); 
@@ -657,45 +771,56 @@
             if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites); 
         }
         localStorage.setItem('my_fav_books', JSON.stringify(favorites));
-    }
+    };
 
-    /* --- 10. MANEJO DE CLIC (UX MEJORADO) --- */
+    /* --- 10. MANEJO DE CLIC / APERTURA --- */
     function handleBookClick(book) {
-        // Si es de la NUBE y tiene link -> Abrir directo (Sin espera, sin carga falsa)
+        // CORRECCIÓN CRÍTICA: Apertura directa para enlaces de Nube
         if (book.type === 'cloud' && book.pdfLink) {
+            // Abrir inmediatamente en nueva pestaña
             window.open(book.pdfLink, '_blank');
-            return; 
+            return; // Detener ejecución para no mostrar barra de carga
         }
 
-        // Si es LOCAL -> Simular carga y abrir Lector
+        // Si es LOCAL o no tiene link, mostrar animación y abrir lector interno
         const overlay = document.getElementById('download-overlay');
         const bar = document.getElementById('progress-fill');
         const txt = document.getElementById('progress-text');
+        const title = document.getElementById('download-text');
         
         overlay.style.display = 'flex';
-        document.getElementById('download-text').innerText = "Abriendo...";
+        title.innerText = "Abriendo...";
         bar.style.width = "0%";
+        txt.innerText = "0%";
         
         let width = 0;
         const interval = setInterval(() => {
-            width += 15; 
+            width += Math.random() * 20 + 5; 
             if (width >= 100) {
+                width = 100;
                 clearInterval(interval);
+                bar.style.width = "100%";
+                txt.innerText = "100%";
+                
                 setTimeout(() => {
                     overlay.style.display = 'none';
-                    openReader(book);
+                    openReader(book); 
                 }, 300);
             } else {
                 bar.style.width = width + "%";
-                txt.innerText = width + "%";
+                txt.innerText = Math.floor(width) + "%";
             }
         }, 50);
     }
 
-    /* --- 11. LECTOR INTERNO SIMPLIFICADO --- */
+    /* --- 11. LECTOR INTERNO --- */
     let currentBookPages = 0;
     let currentPageIndex = 0;
+    
+    // Variables táctiles
     let touchStartX = 0;
+    let isDragging = false;
+    let dragThreshold = 80; 
 
     window.openReader = function(book) {
         const overlay = document.getElementById('reader-overlay');
@@ -705,37 +830,36 @@
         container.innerHTML = ''; 
         currentPageIndex = 0;
 
-        // Eventos Táctiles
-        container.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, {passive: false});
-        container.addEventListener('touchend', e => {
-            const diff = e.changedTouches[0].clientX - touchStartX;
-            if (diff < -50 && currentPageIndex < currentBookPages - 1) { // Next
-                document.getElementById('page-' + currentPageIndex).classList.add('flipped');
-                currentPageIndex++;
-            } else if (diff > 50 && currentPageIndex > 0) { // Prev
-                document.getElementById('page-' + (currentPageIndex - 1)).classList.remove('flipped');
-                currentPageIndex--;
-            }
-        });
+        container.addEventListener('touchstart', handleTouchStart, {passive: false});
+        container.addEventListener('touchmove', handleTouchMove, {passive: false});
+        container.addEventListener('touchend', handleTouchEnd);
 
-        // Página 1: Portada
-        let coverImg = book.cover || "https://via.placeholder.com/300x450?text=" + encodeURIComponent(book.title);
-        createPage(container, 0, `<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">`);
+        let coverImg = book.cover;
+        if(!coverImg) coverImg = "https://via.placeholder.com/300x450?text=" + encodeURIComponent(book.title);
+
+        createPage(container, 0, `<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5)">`);
         
-        // Página 2: Info
         createPage(container, 1, 
-            `<h3 style="color:var(--accent);">${book.title}</h3>
-             <p>Autor: ${book.author}</p>
-             <p style="opacity:0.7; font-size:12px">Este es un visor local. Para lectura completa use el archivo original.</p>`
+            `<h3 style="color:var(--accent); margin-top:0">${book.title}</h3>
+             <p style="font-style:italic; font-weight:bold; color:var(--text-main); opacity:0.9">Autor: ${book.author}</p>
+             <p style="color:var(--text-main); text-align:justify; line-height:1.6; opacity:0.8">
+                Esta es una vista previa local.
+             </p>`
         );
-        
-        // Página 3: Fin
-        createPage(container, 2, `<div style="text-align:center; margin-top:50%">Fin del libro</div>`);
+        createPage(container, 2, 
+            `<div style="display:flex; height:100%; align-items:center; justify-content:center; flex-direction:column">
+                <h2 style="color:var(--text-muted)">Fin</h2>
+            </div>`
+        );
+
         currentBookPages = 3;
     };
 
     window.closeReader = function() { 
         document.getElementById('reader-overlay').style.display = 'none'; 
+        const c = document.getElementById('book3d');
+        const nc = c.cloneNode(true);
+        c.parentNode.replaceChild(nc, c);
     };
 
     function createPage(container, index, content) {
@@ -743,13 +867,70 @@
         page.className = 'page';
         page.id = 'page-' + index;
         page.style.zIndex = 100 - index;
-        page.innerHTML = `<div class="page-content">${content}</div>`;
+        page.innerHTML = `<div class="page-content">${content}</div><div style="text-align:center; color:var(--text-muted); font-size:10px; margin-top:10px; opacity:0.5">${index + 1}</div>`;
         container.appendChild(page);
     }
 
-    // Inicializar
+    // --- Lógica Táctil ---
+    function handleTouchStart(e) {
+        touchStartX = e.touches[0].clientX;
+        isDragging = true;
+    }
+
+    function handleTouchMove(e) {
+        if (!isDragging) return;
+        const touchCurrentX = e.touches[0].clientX;
+        const diff = touchCurrentX - touchStartX;
+        if (Math.abs(diff) > 5) e.preventDefault(); 
+
+        if (diff < 0 && currentPageIndex < currentBookPages - 1) {
+            const currentPage = document.getElementById('page-' + currentPageIndex);
+            if (currentPage) {
+                currentPage.classList.add('dragging');
+                currentPage.style.transform = `translateX(${diff}px)`;
+            }
+        } else if (diff > 0 && currentPageIndex > 0) {
+            const prevPage = document.getElementById('page-' + (currentPageIndex - 1));
+            if (prevPage) {
+                prevPage.classList.add('dragging');
+                prevPage.style.transform = `translateX(calc(-100% + ${diff}px))`;
+            }
+        }
+    }
+
+    function handleTouchEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        const touchCurrentX = e.changedTouches[0].clientX;
+        const diff = touchCurrentX - touchStartX;
+        
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('dragging'));
+
+        if (diff < -dragThreshold && currentPageIndex < currentBookPages - 1) {
+            const p = document.getElementById('page-' + currentPageIndex);
+            p.style.transform = ''; 
+            p.classList.add('flipped');
+            currentPageIndex++;
+        } else if (diff > dragThreshold && currentPageIndex > 0) {
+            const p = document.getElementById('page-' + (currentPageIndex - 1));
+            p.style.transform = ''; 
+            p.classList.remove('flipped');
+            currentPageIndex--;
+        } else {
+            const currentP = document.getElementById('page-' + currentPageIndex);
+            if(currentP) currentP.style.transform = '';
+            if(currentPageIndex > 0) {
+                const prevP = document.getElementById('page-' + (currentPageIndex - 1));
+                if(prevP) prevP.style.transform = '';
+            }
+        }
+    }
+
+    // Inicialización
     renderLibrary('grid-local', localFiles);
+
 </script>
-    <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
+    <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </html>
+
