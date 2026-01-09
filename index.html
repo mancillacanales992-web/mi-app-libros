@@ -10,10 +10,10 @@
     </script>
 
     <style>
-        /* --- MEJORA UX: Bloqueo de Pull-to-Refresh --- */
+        /* --- MEJORA UX --- */
         html, body { overscroll-behavior-y: contain; }
 
-        /* --- 1. SISTEMA DE TEMAS (Originales) --- */
+        /* --- 1. SISTEMA DE TEMAS --- */
         :root {
             --bg-wall: #1e1e24; 
             --brick-1: #25252d; --brick-2: #2b2b36;
@@ -106,7 +106,7 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(10px)} to {opacity:1; transform:translateY(0)} }
 
-        .shelf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px 20px; padding: 15px 15px 70px 15px; overflow-y: auto; }
+        .shelf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px 10px; padding: 15px 10px 70px 10px; overflow-y: auto; }
         
         .book-wrapper { 
             position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
@@ -120,27 +120,33 @@
             border: 1px solid rgba(255,255,255,0.15); transform: translateZ(20px);
         }
 
-        /* --- CORRECCIÓN DE TAMAÑO (COMO EL EJEMPLO) --- */
+        /* --- CORRECCIÓN DEFINITIVA DE TAMAÑO --- */
         .book-cover {
-            width: 80%; /* AJUSTADO: Más pequeño (como tu imagen original) */
-            aspect-ratio: 2/3; /* Mantiene forma rectangular perfecta */
+            /* TAMAÑO FIJO Y PEQUEÑO */
+            height: 120px !important;  /* Forzamos la altura */
+            width: auto !important;    /* El ancho se ajusta solo */
+            max-width: 80px;           /* Tope máximo de ancho por si acaso */
+            
+            aspect-ratio: 2/3;
             object-fit: cover;
             border-radius: 2px;
             transform: rotateY(-12deg); transform-origin: left center;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.6); border-left: 2px solid rgba(255,255,255,0.3);
             background: #333; margin-bottom: 2px; transition: 0.3s;
+            margin: 0 auto; /* Centrado */
         }
         
         .book-cover.generated {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 10px; text-align: center; font-size: 12px; color: white;
+            padding: 5px; text-align: center; font-size: 10px; color: white;
+            box-sizing: border-box;
             background: linear-gradient(45deg, #333, #555);
         }
 
         .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
 
         .delete-icon {
-            position: absolute; top: -5px; right: -5px; width: 20px; height: 20px;
+            position: absolute; top: -5px; right: 5px; width: 20px; height: 20px;
             background: #ff1744; color: white; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; z-index: 50;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid white;
@@ -464,7 +470,7 @@
     </button>
 </footer>
 <script type="module">
-    /* --- 1. CONFIGURACIÓN DE FIREBASE (ORIGINAL + deleteDoc para Admin) --- */
+    /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
@@ -477,7 +483,6 @@
         appId: "1:737226922744:web:8746608081fef3355ff90d"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -485,28 +490,25 @@
     let cloudBooks = []; 
     let localFiles = JSON.parse(localStorage.getItem('my_local_files')) || [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
-    let isAdminMode = false; // Estado para el modo administrador
+    let isAdminMode = false; 
 
     /* --- 3. CONEXIÓN EN TIEMPO REAL (FIRESTORE) --- */
     const q = query(collection(db, "libros"), orderBy("timestamp", "desc"));
     
     onSnapshot(q, (snapshot) => {
-        cloudBooks = []; 
+        cloudBooks = [];
         snapshot.forEach((docSnap) => {
-            // Guardamos el ID del documento para poder borrarlo si somos admin
             cloudBooks.push({ id: docSnap.id, ...docSnap.data(), type: 'cloud' });
         });
-        
-        // Refrescar vistas si están activas
-        refreshActiveView();
+        refreshActiveViews();
     });
 
-    function refreshActiveView() {
+    function refreshActiveViews() {
         if(document.getElementById('recientes').classList.contains('active')) renderLibrary('grid-recientes', cloudBooks);
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
     }
 
-    /* --- 4. FUNCIONES GLOBALES DE INTERFAZ --- */
+    /* --- 4. FUNCIONES GLOBALES (UI) --- */
     window.toggleDrawer = function() { 
         const d = document.getElementById('drawer');
         d.classList.toggle('open'); 
@@ -523,7 +525,6 @@
         const tab = document.getElementById('tab-' + id); 
         if(tab) tab.classList.add('active');
         
-        // Renderizar la grilla correcta
         if(id === 'favoritos') renderLibrary('grid-favoritos', favorites);
         if(id === 'misarchivos') renderLibrary('grid-local', localFiles);
         if(id === 'recientes' || id === 'nube') {
@@ -545,11 +546,11 @@
         renderLibrary('grid-nube', f);
     };
 
-    /* --- 5. NUEVO: MANEJO DE MODALS (Sin Redirección) --- */
+    /* --- 5. MODALS Y FORMULARIOS --- */
     window.handleGenericForm = function(event, title, msg) {
-        event.preventDefault(); // Detiene la recarga/redirección
+        event.preventDefault(); 
         showModal(title, msg);
-        event.target.reset(); // Limpia los campos
+        event.target.reset(); 
     };
 
     window.showModal = function(title, msg) {
@@ -562,167 +563,134 @@
         document.getElementById('success-modal').style.display = 'none';
     };
 
-    /* --- 6. NUEVO: MODO ADMINISTRADOR --- */
+    /* --- 6. MODO ADMINISTRADOR --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
             alert("Modo Admin DESACTIVADO");
-            refreshActiveView();
+            refreshActiveViews();
             return;
         }
-        
-        const pass = prompt("🔒 Ingrese contraseña de Administrador:");
-        if (pass === 'admin123') { // Contraseña simple solicitada
+        const pass = prompt("🔒 Contraseña Admin:");
+        if (pass === 'admin123') {
             isAdminMode = true;
-            alert("✅ MODO ADMIN ACTIVADO: Ahora verás iconos de papelera roja.");
-            refreshActiveView();
+            alert("✅ MODO ADMIN ACTIVADO");
+            refreshActiveViews();
         } else {
-            alert("⛔ Contraseña incorrecta.");
+            alert("⛔ Incorrecto.");
         }
     };
 
     window.deleteCloudBook = async function(docId) {
-        if(!confirm("⚠️ ¿Estás seguro de ELIMINAR este libro de la nube permanentemente?")) return;
-        
+        if(!confirm("⚠️ ¿ELIMINAR este libro permanentemente?")) return;
         try {
             await deleteDoc(doc(db, "libros", docId));
-            showModal("Eliminado", "El libro ha sido borrado de la base de datos.");
-            // La vista se actualiza sola gracias a onSnapshot
+            showModal("Eliminado", "Libro borrado de la base de datos.");
         } catch (e) {
             alert("Error: " + e.message);
         }
     };
 
-    /* --- 7. SUBIDA A NUBE (Modificado para usar Modal) --- */
+    /* --- 7. SUBIDA A NUBE --- */
     window.uploadBookToCloud = async function() {
         const title = document.getElementById('pubTitle').value;
         const author = document.getElementById('pubAuthor').value;
         const link = document.getElementById('pubLink').value;
         const cover = document.getElementById('pubCover').value;
 
-        if(!title || !author || !link) {
-            alert("⚠️ Faltan datos obligatorios.");
-            return;
-        }
-
         const btn = document.querySelector('#publishForm .btn-neon');
         const originalText = btn.innerText;
-        btn.innerText = "⏳ PUBLICANDO...";
+        btn.innerText = "⏳ ...";
         btn.disabled = true;
 
         try {
             await addDoc(collection(db, "libros"), {
-                title: title,
-                author: author,
-                pdfLink: link,
-                cover: cover,
+                title: title, author: author, pdfLink: link, cover: cover,
                 timestamp: serverTimestamp()
             });
-            
-            showModal("¡Publicado!", "Libro agregado exitosamente a la Nube.");
+            showModal("¡Publicado!", "Disponible en la nube.");
             document.getElementById('publishForm').reset();
             window.navigate('recientes');
-
         } catch (e) {
-            console.error("Error subiendo: ", e);
-            alert("❌ Error al subir: " + e.message);
+            alert("Error: " + e.message);
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
         }
     };
 
-    /* --- 8. NUEVO: IMPORTACIÓN MASIVA (Multi-archivo) --- */
+    /* --- 8. IMPORTACIÓN MASIVA --- */
     window.processMassImport = async function() {
-        // Obtenemos la lista de archivos (FileList)
-        const fileInput = document.getElementById('impFile');
-        const files = fileInput.files;
+        const files = document.getElementById('impFile').files;
         const status = document.getElementById('import-status');
         
-        if (files.length === 0) {
-            alert("⚠️ Selecciona al menos un archivo PDF.");
-            return;
-        }
+        if (files.length === 0) { alert("Selecciona un PDF."); return; }
 
-        status.innerText = `Procesando ${files.length} archivos... Por favor espera.`;
+        status.innerText = `Procesando ${files.length} archivos...`;
 
-        // Iteramos sobre cada archivo seleccionado
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            
             try {
-                // 1. Leer archivo
                 const arrayBuffer = await file.arrayBuffer();
-                
-                // 2. Generar Portada con PDF.js
                 const pdf = await pdfjsLib.getDocument(new Uint8Array(arrayBuffer)).promise;
                 const page = await pdf.getPage(1);
                 
                 const viewport = page.getViewport({ scale: 0.5 });
                 const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
+                const ctx = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
-                const coverDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-                // 3. Guardar en LocalStorage
-                // Usamos el nombre del archivo como título provisional si se suben muchos
-                const cleanTitle = file.name.replace('.pdf', '');
                 
-                const newBook = {
-                    title: cleanTitle,
-                    author: "Archivo Local",
-                    cover: coverDataUrl,
+                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                const coverData = canvas.toDataURL('image/jpeg', 0.8);
+
+                localFiles.push({
+                    title: file.name.replace('.pdf', ''),
+                    author: "Local",
+                    cover: coverData,
                     type: 'local',
                     pdfData: null 
-                };
-
-                localFiles.push(newBook);
-
-            } catch (error) {
-                console.error("Error importando " + file.name, error);
+                });
+            } catch (err) {
+                console.error("Error: " + file.name, err);
             }
         }
 
-        // Guardar array completo
         localStorage.setItem('my_local_files', JSON.stringify(localFiles));
-        
         status.innerText = "";
-        showModal("Importación Completa", `Se han guardado ${files.length} libros en tu dispositivo.`);
-        fileInput.value = ""; // Reset input
+        showModal("Importado", `${files.length} libros guardados.`);
+        document.getElementById('impFile').value = ""; 
         window.navigate('misarchivos');
     };
 
-    /* --- 9. RENDERIZADO DE BIBLIOTECA (Con Icono Admin y Portadas Corregidas) --- */
+    /* --- 9. RENDERIZADO (CON AJUSTE DE TAMAÑO APLICADO) --- */
     function renderLibrary(id, books) {
         const c = document.getElementById(id); 
         c.innerHTML = '';
         
         if(!books || books.length === 0) { 
-            c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);margin-top:30px">No hay libros disponibles.</p>'; 
+            c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);margin-top:30px">Vacío.</p>'; 
             return; 
         }
         
+        // Loop de 3 en 3 para estantes
         for(let i=0; i<books.length; i+=3) {
             books.slice(i, i+3).forEach(b => {
-                const fav = favorites.some(f => f.title === b.title) ? 'active' : '';
+                const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
                 const div = document.createElement('div'); 
                 div.className = 'book-wrapper';
                 
-                // Lógica de Portada
+                // Generación de Portada (Respetando CSS de Part 1)
                 let coverHtml = '';
                 if (b.cover && b.cover.trim() !== "") {
-                    // Importante: La clase .book-cover en CSS ya tiene el width 80%
+                    // La clase .book-cover en CSS ya tiene height:120px fijo
                     coverHtml = `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">`;
                 } else {
                     coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);">
-                        <span style="font-size:10px; font-weight:bold; text-shadow:0 1px 2px black;">${b.title}</span>
+                        <span>${b.title}</span>
                     </div>`;
                 }
 
-                // Botón de Borrado (Solo si Admin + Libro de Nube)
                 let deleteBtn = '';
                 if (isAdminMode && b.type === 'cloud') {
                     deleteBtn = `<div class="delete-icon" onclick="event.stopPropagation(); deleteCloudBook('${b.id}')">🗑️</div>`;
@@ -731,7 +699,7 @@
                 div.innerHTML = `
                     <div class="book-title">${b.title}</div>
                     ${deleteBtn}
-                    <svg class="fav-heart ${fav}" width="20" height="20" viewBox="0 0 24 24">
+                    <svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                     ${coverHtml}
@@ -739,7 +707,7 @@
                 
                 div.querySelector('.fav-heart').onclick = (e) => {
                     e.stopPropagation();
-                    window.toggleFav(b, e.target.closest('.fav-heart'));
+                    toggleFav(b, e.target.closest('.fav-heart'));
                 };
 
                 div.onclick = () => handleBookClick(b); 
@@ -760,7 +728,7 @@
         return color;
     }
 
-    window.toggleFav = function(b, el) {
+    function toggleFav(b, el) {
         const idx = favorites.findIndex(f => f.title === b.title);
         if(idx === -1) { 
             favorites.push(b); 
@@ -771,56 +739,43 @@
             if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites); 
         }
         localStorage.setItem('my_fav_books', JSON.stringify(favorites));
-    };
+    }
 
-    /* --- 10. MANEJO DE CLIC / APERTURA --- */
+    /* --- 10. MANEJO DE CLIC --- */
     function handleBookClick(book) {
-        // CORRECCIÓN CRÍTICA: Apertura directa para enlaces de Nube
         if (book.type === 'cloud' && book.pdfLink) {
-            // Abrir inmediatamente en nueva pestaña
-            window.open(book.pdfLink, '_blank');
-            return; // Detener ejecución para no mostrar barra de carga
+            window.open(book.pdfLink, '_blank'); // Abre directo
+            return; 
         }
 
-        // Si es LOCAL o no tiene link, mostrar animación y abrir lector interno
         const overlay = document.getElementById('download-overlay');
         const bar = document.getElementById('progress-fill');
         const txt = document.getElementById('progress-text');
-        const title = document.getElementById('download-text');
         
         overlay.style.display = 'flex';
-        title.innerText = "Abriendo...";
+        document.getElementById('download-text').innerText = "Abriendo...";
         bar.style.width = "0%";
-        txt.innerText = "0%";
         
         let width = 0;
         const interval = setInterval(() => {
-            width += Math.random() * 20 + 5; 
+            width += 15; 
             if (width >= 100) {
-                width = 100;
                 clearInterval(interval);
-                bar.style.width = "100%";
-                txt.innerText = "100%";
-                
                 setTimeout(() => {
                     overlay.style.display = 'none';
-                    openReader(book); 
+                    openReader(book);
                 }, 300);
             } else {
                 bar.style.width = width + "%";
-                txt.innerText = Math.floor(width) + "%";
+                txt.innerText = width + "%";
             }
         }, 50);
     }
 
-    /* --- 11. LECTOR INTERNO --- */
+    /* --- 11. LECTOR --- */
     let currentBookPages = 0;
     let currentPageIndex = 0;
-    
-    // Variables táctiles
     let touchStartX = 0;
-    let isDragging = false;
-    let dragThreshold = 80; 
 
     window.openReader = function(book) {
         const overlay = document.getElementById('reader-overlay');
@@ -830,36 +785,27 @@
         container.innerHTML = ''; 
         currentPageIndex = 0;
 
-        container.addEventListener('touchstart', handleTouchStart, {passive: false});
-        container.addEventListener('touchmove', handleTouchMove, {passive: false});
-        container.addEventListener('touchend', handleTouchEnd);
+        container.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, {passive: false});
+        container.addEventListener('touchend', e => {
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (diff < -50 && currentPageIndex < currentBookPages - 1) { 
+                document.getElementById('page-' + currentPageIndex).classList.add('flipped');
+                currentPageIndex++;
+            } else if (diff > 50 && currentPageIndex > 0) { 
+                document.getElementById('page-' + (currentPageIndex - 1)).classList.remove('flipped');
+                currentPageIndex--;
+            }
+        });
 
-        let coverImg = book.cover;
-        if(!coverImg) coverImg = "https://via.placeholder.com/300x450?text=" + encodeURIComponent(book.title);
-
-        createPage(container, 0, `<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5)">`);
-        
-        createPage(container, 1, 
-            `<h3 style="color:var(--accent); margin-top:0">${book.title}</h3>
-             <p style="font-style:italic; font-weight:bold; color:var(--text-main); opacity:0.9">Autor: ${book.author}</p>
-             <p style="color:var(--text-main); text-align:justify; line-height:1.6; opacity:0.8">
-                Esta es una vista previa local.
-             </p>`
-        );
-        createPage(container, 2, 
-            `<div style="display:flex; height:100%; align-items:center; justify-content:center; flex-direction:column">
-                <h2 style="color:var(--text-muted)">Fin</h2>
-            </div>`
-        );
-
+        let coverImg = book.cover || "https://via.placeholder.com/300x450?text=" + encodeURIComponent(book.title);
+        createPage(container, 0, `<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">`);
+        createPage(container, 1, `<h3 style="color:var(--accent);">${book.title}</h3><p>${book.author}</p>`);
+        createPage(container, 2, `<div style="text-align:center; margin-top:50%">Fin</div>`);
         currentBookPages = 3;
     };
 
     window.closeReader = function() { 
         document.getElementById('reader-overlay').style.display = 'none'; 
-        const c = document.getElementById('book3d');
-        const nc = c.cloneNode(true);
-        c.parentNode.replaceChild(nc, c);
     };
 
     function createPage(container, index, content) {
@@ -867,70 +813,13 @@
         page.className = 'page';
         page.id = 'page-' + index;
         page.style.zIndex = 100 - index;
-        page.innerHTML = `<div class="page-content">${content}</div><div style="text-align:center; color:var(--text-muted); font-size:10px; margin-top:10px; opacity:0.5">${index + 1}</div>`;
+        page.innerHTML = `<div class="page-content">${content}</div>`;
         container.appendChild(page);
     }
 
-    // --- Lógica Táctil ---
-    function handleTouchStart(e) {
-        touchStartX = e.touches[0].clientX;
-        isDragging = true;
-    }
-
-    function handleTouchMove(e) {
-        if (!isDragging) return;
-        const touchCurrentX = e.touches[0].clientX;
-        const diff = touchCurrentX - touchStartX;
-        if (Math.abs(diff) > 5) e.preventDefault(); 
-
-        if (diff < 0 && currentPageIndex < currentBookPages - 1) {
-            const currentPage = document.getElementById('page-' + currentPageIndex);
-            if (currentPage) {
-                currentPage.classList.add('dragging');
-                currentPage.style.transform = `translateX(${diff}px)`;
-            }
-        } else if (diff > 0 && currentPageIndex > 0) {
-            const prevPage = document.getElementById('page-' + (currentPageIndex - 1));
-            if (prevPage) {
-                prevPage.classList.add('dragging');
-                prevPage.style.transform = `translateX(calc(-100% + ${diff}px))`;
-            }
-        }
-    }
-
-    function handleTouchEnd(e) {
-        if (!isDragging) return;
-        isDragging = false;
-        const touchCurrentX = e.changedTouches[0].clientX;
-        const diff = touchCurrentX - touchStartX;
-        
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('dragging'));
-
-        if (diff < -dragThreshold && currentPageIndex < currentBookPages - 1) {
-            const p = document.getElementById('page-' + currentPageIndex);
-            p.style.transform = ''; 
-            p.classList.add('flipped');
-            currentPageIndex++;
-        } else if (diff > dragThreshold && currentPageIndex > 0) {
-            const p = document.getElementById('page-' + (currentPageIndex - 1));
-            p.style.transform = ''; 
-            p.classList.remove('flipped');
-            currentPageIndex--;
-        } else {
-            const currentP = document.getElementById('page-' + currentPageIndex);
-            if(currentP) currentP.style.transform = '';
-            if(currentPageIndex > 0) {
-                const prevP = document.getElementById('page-' + (currentPageIndex - 1));
-                if(prevP) prevP.style.transform = '';
-            }
-        }
-    }
-
-    // Inicialización
     renderLibrary('grid-local', localFiles);
-
 </script>
+<script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
-    <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </html>
 
