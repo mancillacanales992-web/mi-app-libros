@@ -10,10 +10,10 @@
     </script>
 
     <style>
-        /* --- MEJORA UX --- */
+        /* --- UX --- */
         html, body { overscroll-behavior-y: contain; }
 
-        /* --- 1. SISTEMA DE TEMAS --- */
+        /* --- 1. SISTEMA DE TEMAS (Tus colores originales) --- */
         :root {
             --bg-wall: #1e1e24; 
             --brick-1: #25252d; --brick-2: #2b2b36;
@@ -106,6 +106,7 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(10px)} to {opacity:1; transform:translateY(0)} }
 
+        /* Ajuste de Grid para 3 libros */
         .shelf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px 10px; padding: 15px 10px 70px 10px; overflow-y: auto; }
         
         .book-wrapper { 
@@ -120,37 +121,80 @@
             border: 1px solid rgba(255,255,255,0.15); transform: translateZ(20px);
         }
 
-        /* --- CORRECCIÓN DEFINITIVA DE TAMAÑO --- */
+        /* --- PORTADAS PEQUEÑAS (FIXED) --- */
         .book-cover {
-            /* TAMAÑO FIJO Y PEQUEÑO */
-            height: 120px !important;  
-            width: auto !important;    
-            max-width: 80px;           
-            
-            aspect-ratio: 2/3;
-            object-fit: cover;
-            border-radius: 2px;
+            height: 120px !important; width: auto !important; max-width: 80px;           
+            aspect-ratio: 2/3; object-fit: cover; border-radius: 2px;
             transform: rotateY(-12deg); transform-origin: left center;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.6); border-left: 2px solid rgba(255,255,255,0.3);
-            background: #333; margin-bottom: 2px; transition: 0.3s;
-            margin: 0 auto; 
+            background: #333; margin-bottom: 2px; transition: 0.3s; margin: 0 auto; 
         }
-        
         .book-cover.generated {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 5px; text-align: center; font-size: 10px; color: white;
-            box-sizing: border-box;
-            background: linear-gradient(45deg, #333, #555);
+            box-sizing: border-box; background: linear-gradient(45deg, #333, #555);
         }
-
         .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
 
         .delete-icon {
             position: absolute; top: -5px; right: 5px; width: 20px; height: 20px;
             background: #ff1744; color: white; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; z-index: 50;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid white;
-            font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid white; font-size: 12px;
+        }
+
+        /* --- ESTILOS VIDEOS Y VERSÍCULOS --- */
+        .video-card {
+            background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden;
+            margin-bottom: 20px; border: 1px solid var(--ui-border);
+            display: flex; flex-direction: column;
+        }
+        .video-thumb {
+            width: 100%; height: 180px; object-fit: cover; background: #000;
+            display: block; cursor: pointer;
+        }
+        .video-info { padding: 15px; }
+        .video-title { font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+        .video-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+        /* Efecto Hojas (Versículo) */
+        #versiculo-container {
+            position: relative; min-height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding: 20px; text-align: center;
+        }
+        .leaf {
+            position: absolute; top: -30px;
+            width: 25px; height: 25px;
+            font-size: 20px; color: rgba(255, 165, 0, 0.7);
+            z-index: 15; pointer-events: none;
+            animation: fall linear infinite;
+        }
+        .leaf::after { content: '🍂'; } 
+        @keyframes fall {
+            0% { transform: translateY(-30px) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Efecto Lluvia (Videos) */
+        #videos { position: relative; overflow: hidden; min-height: 100vh; }
+        .rain {
+            position: absolute; top: -20px; width: 2px; height: 15px;
+            background: var(--accent); opacity: 0.6; z-index: 5; pointer-events: none;
+            animation: fallRain linear infinite;
+        }
+        @keyframes fallRain { to { transform: translateY(100vh); } }
+
+        .verse-card-display {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            padding: 30px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-top: 40px; z-index: 10;
+            max-width: 90%; width: 100%; box-sizing: border-box;
+        }
+        .verse-img {
+            width: 100%; border-radius: 10px; margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover;
         }
 
         /* --- MODALS --- */
@@ -165,29 +209,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
-
-        /* --- LECTOR --- */
-        #reader-overlay { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-wall); z-index: 5000; overflow: hidden; }
-        .book-3d { width: 100%; height: 100%; position: relative; overflow: hidden; touch-action: pan-y; }
-        .page { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg-wall); color: var(--text-main);
-            display: flex; flex-direction: column; padding: 25px 20px; box-sizing: border-box; 
-            box-shadow: -5px 0 20px rgba(0,0,0,0.5); border-left: 1px solid var(--ui-border); 
-            transition: transform 0.3s ease-out; will-change: transform;
-        }
-        .page.flipped { transform: translateX(-100%); }
-        .page.dragging { transition: none !important; }
-        .page-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
-        .close-reader-btn {
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: white;
-            width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 16px; z-index: 6000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
-        }
-
-        #download-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:6000; flex-direction:column; align-items:center; justify-content:center; color:var(--accent); }
-        .progress-bar { width:70%; height:4px; background:#333; margin-top:20px; border-radius:2px; }
-        .progress-fill { height:100%; width:0%; background:var(--accent); transition:0.1s; box-shadow:0 0 10px var(--accent); }
 
         /* Menú & Footer */
         .drawer {
@@ -224,21 +245,9 @@
     <div class="modal-content">
         <div style="font-size:40px; margin-bottom:10px">✨</div>
         <h3 id="modal-title" style="color:var(--text-main); margin:0 0 10px 0;">¡Éxito!</h3>
-        <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Tu solicitud ha sido enviada.</p>
+        <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Operación realizada.</p>
         <button class="btn-neon" onclick="closeModal()">CERRAR</button>
     </div>
-</div>
-
-<div id="download-overlay">
-    <div style="font-size:50px; margin-bottom:20px; filter:drop-shadow(0 0 15px var(--accent))">☁️</div>
-    <h3 id="download-text" style="font-weight:300; letter-spacing:1px">Sincronizando...</h3>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    <p id="progress-text" style="margin-top:10px; font-size:12px; opacity:0.7">0%</p>
-</div>
-
-<div id="reader-overlay">
-    <button class="close-reader-btn" onclick="closeReader()">✕</button>
-    <div class="book-3d" id="book3d"></div>
 </div>
 
 <div id="drawer" class="drawer">
@@ -265,10 +274,10 @@
         </div>
     </div>
     <nav class="nav-tabs">
-        <button id="tab-recientes" class="active" onclick="navigate('recientes')">Recientes</button>
+        <button id="tab-recientes" class="active" onclick="navigate('recientes')">Inicio</button>
         <button id="tab-nube" onclick="navigate('nube')">Nube</button>
-        <button id="tab-mis" onclick="navigate('misarchivos')">Mis Archivos</button>
-        <button id="tab-importar" onclick="navigate('importar')">Importar</button>
+        <button id="tab-versiculo" onclick="navigate('versiculo')">Versículo</button>
+        <button id="tab-videos" onclick="navigate('videos')">Videos</button>
     </nav>
 </header>
 
@@ -282,8 +291,36 @@
         <div class="shelf-grid" id="grid-nube"></div>
     </div>
 
-    <div id="misarchivos" class="page-section">
-        <div class="shelf-grid" id="grid-local"></div>
+    <div id="versiculo" class="page-section">
+        <div id="versiculo-container">
+            <div id="admin-verse-form" style="display:none; width:100%; margin-bottom:20px; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px;">
+                <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Versículo Diario</h4>
+                <input type="text" id="verseTitle" class="input-box" placeholder="Título (ej: La Paz)" style="margin-bottom:5px">
+                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto o descripción del versículo..." style="margin-bottom:5px"></textarea>
+                <input type="url" id="verseImgUrl" class="input-box" placeholder="URL de la imagen" style="margin-bottom:5px">
+                <button class="btn-neon" onclick="updateDailyVerse()">PUBLICAR</button>
+                <button class="btn-neon" onclick="deleteDailyVerse()" style="margin-top:10px; background:red; border-color:red; color:white;">ELIMINAR VERSÍCULO</button>
+            </div>
+
+            <div class="verse-card-display">
+                <img id="displayVerseImg" class="verse-img" src="" style="display:none">
+                <h2 id="displayVerseTitle" style="color:var(--accent); margin-top:0;"></h2>
+                <p id="displayVerseText" style="color:#fff; font-family:'Georgia', serif; font-style:italic; font-size:16px; line-height:1.5;"></p>
+                <p id="verseDate" style="color:var(--text-muted); font-size:12px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="videos" class="page-section">
+        <div id="admin-video-form" style="display:none; margin:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px; z-index:20; position:relative;">
+            <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Subir Video</h4>
+            <input type="text" id="vidTitle" class="input-box" placeholder="Título del Video">
+            <input type="text" id="vidDesc" class="input-box" placeholder="Descripción breve">
+            <input type="url" id="vidUrl" class="input-box" placeholder="Link de YouTube">
+            <button class="btn-neon" onclick="uploadVideo()">AGREGAR VIDEO</button>
+        </div>
+
+        <div id="video-list" style="padding:15px; padding-bottom:80px; z-index:10; position:relative;"></div>
     </div>
 
     <div id="favoritos" class="page-section">
@@ -294,8 +331,6 @@
     <div id="configuracion" class="page-section">
         <div class="glass-panel">
             <h2 style="margin-top:0; color:var(--accent); text-align:center"> Atmósfera de Lectura</h2>
-            <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:20px">Selecciona un tema visual para la biblioteca:</p>
-            
             <div class="theme-grid">
                 <div class="theme-card active" onclick="changeTheme('default', this)"><div class="theme-preview-circle" style="background:#1e1e24; border-color:#555"></div><div class="theme-name">Dark Slate</div></div>
                 <div class="theme-card" onclick="changeTheme('orange', this)"><div class="theme-preview-circle" style="background:#1a1008; border-color:#ff6d00"></div><div class="theme-name">Energetic Orange</div></div>
@@ -308,21 +343,8 @@
             </div>
             
             <div style="text-align:center; margin-top:20px; opacity:0.3">
-                <button onclick="toggleAdminMode()" style="background:none; border:none; color:var(--text-muted); font-size:10px;">Admin</button>
+                <button onclick="toggleAdminMode()" style="background:none; border:none; color:var(--text-muted); font-size:10px;">Admin Mode</button>
             </div>
-        </div>
-    </div>
-
-    <div id="importar" class="page-section">
-        <div class="glass-panel" style="text-align:center">
-            <h3 style="color:var(--accent)">📂 Archivos Locales</h3>
-            <p style="font-size:13px; color:var(--text-muted)">Carga tus PDFs. <b>La portada se generará automáticamente.</b></p>
-            
-            <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">ARCHIVOS (PDF)</label>
-            <input type="file" id="impFile" accept=".pdf" multiple class="input-box" style="padding:10px">
-            
-            <button class="btn-neon" onclick="processMassImport()">GUARDAR EN DISPOSITIVO</button>
-            <p id="import-status" style="font-size:11px; margin-top:5px; color:var(--text-main)"></p>
         </div>
     </div>
 
@@ -330,20 +352,15 @@
         <div class="glass-panel">
             <h2 style="color:var(--accent);margin-top:0;"> Subir a la Nube</h2>
             <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px">Agrega un libro a la base de datos pública.</p>
-            
             <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'El libro está disponible para todos.')">
                 <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">TÍTULO</label>
                 <input type="text" id="pubTitle" class="input-box" required placeholder="Título del libro">
-                
                 <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">AUTOR</label>
                 <input type="text" id="pubAuthor" class="input-box" required placeholder="Nombre del Autor">
-                
                 <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PDF (Google Drive/Dropbox)</label>
                 <input type="url" id="pubLink" class="input-box" required placeholder="https://...">
-
                 <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PORTADA (Opcional)</label>
                 <input type="url" id="pubCover" class="input-box" placeholder="https://... (Si está vacío, se genera sola)">
-                
                 <button type="button" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR AHORA</button>
             </form>
         </div>
@@ -362,8 +379,9 @@
         <div class="glass-panel">
             <h2 style="color:var(--accent)">Solicitar Libro</h2>
             <p style="font-size:12px; color:var(--text-muted)">Haremos lo posible por conseguirlo.</p>
-            
-            <form onsubmit="handleGenericForm(event, 'Solicitud Enviada', '¡Gracias! Buscaremos el libro.')">
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Solicitud Enviada', '¡Gracias! Buscaremos el libro.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="Pedido de Libro">
                 <input type="text" name="libro" class="input-box" placeholder="Nombre del Libro" required>
                 <input type="text" name="autor" class="input-box" placeholder="Autor (Opcional)">
                 <button type="submit" class="btn-neon">ENVIAR PEDIDO</button>
@@ -424,7 +442,10 @@
             <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); font-size:16px;"> REPORTE Y GESTIÓN</h2>
             <p style="font-size:11px; margin-bottom:20px; color:var(--text-muted); text-align:center">Para errores técnicos, enlaces rotos o gestión de derechos de autor.</p>
 
-            <form onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos tu caso a la brevedad.')">
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos tu caso a la brevedad.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="REPORTE URGENTE - APP BIBLIOTECA">
+                
                 <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">1. DATOS DE CONTACTO</div>
                 <input type="text" name="nombre" class="input-box" placeholder="Nombre Completo" required>
                 <input type="email" name="email" class="input-box" placeholder="Email" required>
@@ -472,7 +493,7 @@
 <script type="module">
     /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDLyZS-alUh5DOtBBtts-8D_hza-n71Y3I",
@@ -486,67 +507,45 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    /* --- 2. SISTEMA DE BASE DE DATOS LOCAL (INDEXEDDB) --- */
-    // Esto soluciona el problema de "Pantalla Negra" guardando el PDF real
-    const DB_NAME = "BiblioApp_Files";
-    const DB_VERSION = 1;
-
-    function openDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains("pdfs")) {
-                    db.createObjectStore("pdfs"); // Almacén simple clave-valor
-                }
-            };
-            request.onsuccess = (e) => resolve(e.target.result);
-            request.onerror = (e) => reject("Error DB");
-        });
-    }
-
-    async function savePDFToDevice(id, blob) {
-        const db = await openDB();
-        const tx = db.transaction("pdfs", "readwrite");
-        tx.objectStore("pdfs").put(blob, id);
-        return new Promise((resolve) => {
-            tx.oncomplete = () => resolve();
-        });
-    }
-
-    async function getPDFFromDevice(id) {
-        const db = await openDB();
-        const tx = db.transaction("pdfs", "readonly");
-        return new Promise((resolve, reject) => {
-            const req = tx.objectStore("pdfs").get(id);
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject("No encontrado");
-        });
-    }
-
-    /* --- 3. ESTADO GLOBAL --- */
+    /* --- 2. ESTADO GLOBAL --- */
     let cloudBooks = []; 
-    let localFiles = JSON.parse(localStorage.getItem('my_local_files_v2')) || [];
+    let youtubeVideos = [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
     let isAdminMode = false; 
-
-    /* --- 4. CONEXIÓN FIREBASE --- */
-    const q = query(collection(db, "libros"), orderBy("timestamp", "desc"));
     
-    onSnapshot(q, (snapshot) => {
+    // Controladores de animación
+    let leavesInterval; 
+    let rainInterval;
+
+    /* --- 3. CONEXIÓN A FIREBASE (TIEMPO REAL) --- */
+    
+    // A) Libros
+    onSnapshot(query(collection(db, "libros"), orderBy("timestamp", "desc")), (snapshot) => {
         cloudBooks = [];
-        snapshot.forEach((docSnap) => {
-            cloudBooks.push({ id: docSnap.id, ...docSnap.data(), type: 'cloud' });
-        });
+        snapshot.forEach((doc) => cloudBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
         refreshActiveViews();
+    });
+
+    // B) Videos
+    onSnapshot(query(collection(db, "videos"), orderBy("timestamp", "desc")), (snapshot) => {
+        youtubeVideos = [];
+        snapshot.forEach((doc) => youtubeVideos.push({ id: doc.id, ...doc.data() }));
+        refreshActiveViews();
+    });
+
+    // C) Versículo del Día
+    onSnapshot(doc(db, "configuracion", "versiculo_diario"), (docSnap) => {
+        renderVerse(docSnap.exists() ? docSnap.data() : null);
     });
 
     function refreshActiveViews() {
         if(document.getElementById('recientes').classList.contains('active')) renderLibrary('grid-recientes', cloudBooks);
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
+        if(document.getElementById('videos').classList.contains('active')) renderVideoList();
+        if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
     }
 
-    /* --- 5. FUNCIONES DE UI --- */
+    /* --- 4. NAVEGACIÓN Y ANIMACIONES --- */
     window.toggleDrawer = function() { 
         const d = document.getElementById('drawer');
         d.classList.toggle('open'); 
@@ -554,20 +553,50 @@
     };
 
     window.navigate = function(id) {
+        // Limpiar clases activas
         document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
         
+        // Activar sección actual
         const target = document.getElementById(id); 
         if(target) target.classList.add('active');
         
         const tab = document.getElementById('tab-' + id); 
         if(tab) tab.classList.add('active');
         
+        // --- GESTIÓN DE CONTENIDO ---
         if(id === 'favoritos') renderLibrary('grid-favoritos', favorites);
-        if(id === 'misarchivos') renderLibrary('grid-local', localFiles);
-        if(id === 'recientes' || id === 'nube') {
-            document.getElementById('searchInput').value = '';
-            renderLibrary(id === 'recientes' ? 'grid-recientes' : 'grid-nube', cloudBooks);
+        if(id === 'recientes' || id === 'nube') renderLibrary(id === 'recientes' ? 'grid-recientes' : 'grid-nube', cloudBooks);
+        
+        // --- GESTIÓN DE EFECTOS ---
+        
+        // Efecto Lluvia (Solo en Videos)
+        if(id === 'videos') {
+            renderVideoList();
+            startRain(); 
+        } else {
+            stopRain();
+        }
+        
+        // Efecto Hojas (Solo en Versículo)
+        if(id === 'versiculo') {
+            startFallingLeaves();
+        } else {
+            stopFallingLeaves();
+        }
+    };
+
+    window.searchBooks = function(q) {
+        const t = q.toLowerCase();
+        // Filtro Libros
+        const fBooks = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
+        renderLibrary('grid-recientes', fBooks);
+        renderLibrary('grid-nube', fBooks);
+        
+        // Filtro Videos
+        if(document.getElementById('videos').classList.contains('active')) {
+            const fVideos = youtubeVideos.filter(v => v.title.toLowerCase().includes(t));
+            renderVideoList(fVideos);
         }
     };
 
@@ -577,14 +606,7 @@
         if(element) element.classList.add('active');
     };
 
-    window.searchBooks = function(q) {
-        const t = q.toLowerCase();
-        const f = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
-        renderLibrary('grid-recientes', f); 
-        renderLibrary('grid-nube', f);
-    };
-
-    /* --- 6. MODALS --- */
+    /* --- 5. MODALS --- */
     window.handleGenericForm = function(event, title, msg) {
         event.preventDefault(); 
         showModal(title, msg);
@@ -601,133 +623,233 @@
         document.getElementById('success-modal').style.display = 'none';
     };
 
-    /* --- 7. MODO ADMIN --- */
+    /* --- 6. MODO ADMINISTRADOR --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
-            alert("Modo Admin DESACTIVADO");
+            toggleAdminForms(false);
+            alert("Modo Admin: DESACTIVADO");
             refreshActiveViews();
             return;
         }
         const pass = prompt("🔒 Contraseña Admin:");
         if (pass === 'admin123') {
             isAdminMode = true;
-            alert("✅ MODO ADMIN ACTIVADO");
+            toggleAdminForms(true);
+            alert("✅ Modo Admin: ACTIVADO");
             refreshActiveViews();
         } else {
-            alert("⛔ Incorrecto.");
+            alert("⛔ Contraseña incorrecta.");
         }
     };
 
-    window.deleteCloudBook = async function(docId) {
-        if(!confirm("⚠️ ¿ELIMINAR este libro permanentemente?")) return;
+    function toggleAdminForms(show) {
+        const display = show ? 'block' : 'none';
+        const vForm = document.getElementById('admin-video-form');
+        const verseForm = document.getElementById('admin-verse-form');
+        if(vForm) vForm.style.display = display;
+        if(verseForm) verseForm.style.display = display;
+    }
+
+    /* --- 7. LÓGICA DE VIDEOS (YOUTUBE) --- */
+    window.uploadVideo = async function() {
+        const title = document.getElementById('vidTitle').value;
+        const desc = document.getElementById('vidDesc').value;
+        const url = document.getElementById('vidUrl').value;
+
+        if(!title || !url) return alert("Falta título o link");
+
         try {
-            await deleteDoc(doc(db, "libros", docId));
-            showModal("Eliminado", "Libro borrado de la base de datos.");
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
+            await addDoc(collection(db, "videos"), {
+                title: title, desc: desc, url: url,
+                timestamp: serverTimestamp()
+            });
+            showModal("Video Agregado", "Ya aparece en la lista.");
+            document.getElementById('vidTitle').value = "";
+            document.getElementById('vidDesc').value = "";
+            document.getElementById('vidUrl').value = "";
+        } catch (e) { alert("Error: " + e.message); }
     };
 
-    /* --- 8. SUBIDA NUBE --- */
+    // Función Inteligente para extraer ID de YouTube (Cualquier formato)
+    function getYoutubeId(url) {
+        if(!url) return null;
+        // Soporta youtu.be, youtube.com, embeds, etc.
+        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function renderVideoList(list = youtubeVideos) {
+        const container = document.getElementById('video-list');
+        container.innerHTML = '';
+
+        if(list.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px">No hay videos disponibles.</p>';
+            return;
+        }
+
+        list.forEach(v => {
+            const videoId = getYoutubeId(v.url);
+            // Usamos img.youtube.com que es el servidor oficial de imágenes
+            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=No+Thumbnail';
+
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            
+            // Botón eliminar solo para Admin
+            let deleteBtn = '';
+            if(isAdminMode) {
+                deleteBtn = `<button onclick="deleteItem('videos', '${v.id}')" style="background:#ff1744; color:white; border:none; width:100%; padding:10px; font-weight:bold; cursor:pointer; border-top:1px solid #555;">🗑️ ELIMINAR VIDEO</button>`;
+            }
+
+            card.innerHTML = `
+                <img src="${thumbUrl}" class="video-thumb" onclick="window.open('${v.url}', '_blank')" onerror="this.src='https://via.placeholder.com/480x360?text=Error'">
+                <div class="video-info">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-desc">${v.desc || ''}</div>
+                </div>
+                ${deleteBtn}
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    /* --- 8. LÓGICA VERSÍCULO (HOJAS) --- */
+    window.updateDailyVerse = async function() {
+        const title = document.getElementById('verseTitle').value;
+        const text = document.getElementById('verseText').value;
+        const img = document.getElementById('verseImgUrl').value;
+        
+        if(!text) return alert("Escribe el contenido del versículo");
+
+        try {
+            await setDoc(doc(db, "configuracion", "versiculo_diario"), {
+                title: title,
+                text: text,
+                image: img,
+                date: new Date().toLocaleDateString()
+            });
+            showModal("Actualizado", "El versículo ha sido publicado.");
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    window.deleteDailyVerse = async function() {
+        if(!confirm("¿Borrar el versículo actual?")) return;
+        try {
+            await deleteDoc(doc(db, "configuracion", "versiculo_diario"));
+            showModal("Eliminado", "Sección de versículo limpiada.");
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    function renderVerse(data) {
+        if(!data) {
+            document.getElementById('displayVerseTitle').innerText = "";
+            document.getElementById('displayVerseText').innerText = "No hay versículo publicado hoy.";
+            document.getElementById('displayVerseImg').style.display = 'none';
+            document.getElementById('verseDate').innerText = "";
+            return;
+        }
+
+        document.getElementById('displayVerseTitle').innerText = data.title || "Versículo Diario";
+        document.getElementById('displayVerseText').innerText = `"${data.text}"`;
+        document.getElementById('verseDate').innerText = "Fecha: " + (data.date || "Hoy");
+        
+        const imgEl = document.getElementById('displayVerseImg');
+        if(data.image) {
+            imgEl.src = data.image;
+            imgEl.style.display = 'block';
+        } else {
+            imgEl.style.display = 'none';
+        }
+    }
+
+    /* --- 9. ANIMACIONES (OPTIMIZADAS) --- */
+    
+    // Hojas (Versículo)
+    function startFallingLeaves() {
+        const container = document.getElementById('versiculo-container');
+        if(leavesInterval) clearInterval(leavesInterval);
+
+        leavesInterval = setInterval(() => {
+            if(container.querySelectorAll('.leaf').length > 15) return; // Límite para rendimiento
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = Math.random() * 90 + "%";
+            leaf.style.animationDuration = (Math.random() * 3 + 4) + "s";
+            leaf.onanimationend = () => leaf.remove();
+            container.appendChild(leaf);
+        }, 800);
+    }
+
+    function stopFallingLeaves() {
+        if(leavesInterval) clearInterval(leavesInterval);
+        const container = document.getElementById('versiculo-container');
+        if(container) container.querySelectorAll('.leaf').forEach(l => l.remove());
+    }
+
+    // Lluvia (Videos)
+    function startRain() {
+        const container = document.getElementById('videos');
+        if(rainInterval) clearInterval(rainInterval);
+
+        rainInterval = setInterval(() => {
+            if(container.querySelectorAll('.rain').length > 40) return;
+            const drop = document.createElement('div');
+            drop.className = 'rain';
+            drop.style.left = Math.random() * 100 + "%";
+            drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + "s";
+            drop.onanimationend = () => drop.remove();
+            container.appendChild(drop);
+        }, 100);
+    }
+
+    function stopRain() {
+        if(rainInterval) clearInterval(rainInterval);
+        const container = document.getElementById('videos');
+        if(container) container.querySelectorAll('.rain').forEach(r => r.remove());
+    }
+
+    /* --- 10. FUNCIONES GENÉRICAS --- */
+    window.deleteItem = async function(collectionName, id) {
+        if(!confirm("⚠️ ¿Eliminar permanentemente?")) return;
+        try {
+            await deleteDoc(doc(db, collectionName, id));
+        } catch (e) { alert("Error: " + e.message); }
+    };
+
     window.uploadBookToCloud = async function() {
         const title = document.getElementById('pubTitle').value;
         const author = document.getElementById('pubAuthor').value;
         const link = document.getElementById('pubLink').value;
         const cover = document.getElementById('pubCover').value;
-
         const btn = document.querySelector('#publishForm .btn-neon');
-        const originalText = btn.innerText;
+        
+        if(!title || !link) return alert("Faltan datos obligatorios");
+        
         btn.innerText = "⏳ ...";
         btn.disabled = true;
-
         try {
             await addDoc(collection(db, "libros"), {
                 title: title, author: author, pdfLink: link, cover: cover,
                 timestamp: serverTimestamp()
             });
-            showModal("¡Publicado!", "Disponible en la nube.");
+            showModal("¡Publicado!", "Libro en la nube.");
             document.getElementById('publishForm').reset();
             window.navigate('recientes');
-        } catch (e) {
-            alert("Error: " + e.message);
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+        } catch (e) { alert("Error: " + e.message); }
+        finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; }
     };
 
-    /* --- 9. IMPORTACIÓN MASIVA (CORREGIDA) --- */
-    window.processMassImport = async function() {
-        const fileInput = document.getElementById('impFile');
-        const files = fileInput.files; // Obtiene la lista completa
-        const status = document.getElementById('import-status');
-        
-        if (!files || files.length === 0) { 
-            alert("⚠️ Selecciona al menos un PDF."); 
-            return; 
-        }
-
-        status.innerText = `Procesando ${files.length} archivos...`;
-
-        // Iterar sobre TODOS los archivos seleccionados
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const uniqueID = "local_" + Date.now() + "_" + i; // ID único para DB
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                
-                // 1. Guardar el PDF real en IndexedDB (Solución pantalla negra)
-                const blob = new Blob([arrayBuffer], {type: "application/pdf"});
-                await savePDFToDevice(uniqueID, blob);
-
-                // 2. Generar Portada
-                const pdf = await pdfjsLib.getDocument(new Uint8Array(arrayBuffer)).promise;
-                const page = await pdf.getPage(1);
-                
-                const viewport = page.getViewport({ scale: 0.5 });
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-                const coverData = canvas.toDataURL('image/jpeg', 0.8);
-
-                // 3. Guardar Metadatos en LocalStorage
-                localFiles.push({
-                    id: uniqueID, // Referencia al archivo en IndexedDB
-                    title: file.name.replace('.pdf', ''),
-                    author: "Archivo Local",
-                    cover: coverData,
-                    type: 'local'
-                });
-
-            } catch (err) {
-                console.error("Error importando " + file.name, err);
-            }
-        }
-
-        // Guardar lista de metadatos
-        localStorage.setItem('my_local_files_v2', JSON.stringify(localFiles));
-        
-        status.innerText = "";
-        showModal("Importación Completa", `${files.length} libros guardados y listos para leer.`);
-        fileInput.value = ""; 
-        window.navigate('misarchivos');
-    };
-
-    /* --- 10. RENDERIZADO (TAMAÑO PEQUEÑO FORZADO) --- */
     function renderLibrary(id, books) {
-        const c = document.getElementById(id); 
+        const c = document.getElementById(id);
         c.innerHTML = '';
         
         if(!books || books.length === 0) { 
-            c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);margin-top:30px">Vacío.</p>'; 
+            c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);margin-top:30px">No hay libros.</p>'; 
             return; 
         }
-        
+
         for(let i=0; i<books.length; i+=3) {
             books.slice(i, i+3).forEach(b => {
                 const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
@@ -736,34 +858,25 @@
                 
                 let coverHtml = '';
                 if (b.cover && b.cover.trim() !== "") {
-                    // La clase CSS .book-cover ya fuerza el tamaño pequeño
                     coverHtml = `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">`;
                 } else {
-                    coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);">
-                        <span>${b.title}</span>
-                    </div>`;
+                    coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);"><span>${b.title}</span></div>`;
                 }
 
                 let deleteBtn = '';
                 if (isAdminMode && b.type === 'cloud') {
-                    deleteBtn = `<div class="delete-icon" onclick="event.stopPropagation(); deleteCloudBook('${b.id}')">🗑️</div>`;
+                    deleteBtn = `<div class="delete-icon" onclick="event.stopPropagation(); deleteItem('libros', '${b.id}')">🗑️</div>`;
                 }
 
                 div.innerHTML = `
                     <div class="book-title">${b.title}</div>
                     ${deleteBtn}
-                    <svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+                    <svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     ${coverHtml}
                 `;
                 
-                div.querySelector('.fav-heart').onclick = (e) => {
-                    e.stopPropagation();
-                    toggleFav(b, e.target.closest('.fav-heart'));
-                };
-
-                div.onclick = () => handleBookClick(b); 
+                div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
+                div.onclick = () => window.open(b.pdfLink, '_blank'); 
                 c.appendChild(div);
             });
             const s = document.createElement('div'); s.className = 'shelf-wood'; c.appendChild(s);
@@ -783,57 +896,14 @@
 
     function toggleFav(b, el) {
         const idx = favorites.findIndex(f => f.title === b.title);
-        if(idx === -1) { 
-            favorites.push(b); 
-            if(el) el.classList.add('active'); 
-        } else { 
-            favorites.splice(idx, 1); 
-            if(el) el.classList.remove('active'); 
-            if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites); 
-        }
+        if(idx === -1) { favorites.push(b); if(el) el.classList.add('active'); }
+        else { favorites.splice(idx, 1); if(el) el.classList.remove('active'); 
+        if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites); }
         localStorage.setItem('my_fav_books', JSON.stringify(favorites));
     }
 
-    /* --- 11. MANEJO DE CLIC Y LECTURA --- */
-    async function handleBookClick(book) {
-        // A) LIBRO NUBE -> Link Externo
-        if (book.type === 'cloud' && book.pdfLink) {
-            window.open(book.pdfLink, '_blank');
-            return; 
-        }
-
-        // B) LIBRO LOCAL -> Abrir desde IndexedDB (Solución Pantalla Negra)
-        if (book.type === 'local') {
-            const overlay = document.getElementById('download-overlay');
-            overlay.style.display = 'flex';
-            document.getElementById('download-text').innerText = "Abriendo PDF...";
-            document.getElementById('progress-fill').style.width = "50%";
-
-            try {
-                // Recuperar archivo real
-                const pdfBlob = await getPDFFromDevice(book.id);
-                if (!pdfBlob) {
-                    alert("❌ Error: El archivo no se encuentra en el dispositivo.");
-                    overlay.style.display = 'none';
-                    return;
-                }
-                
-                // Crear URL temporal y abrir
-                const fileURL = URL.createObjectURL(pdfBlob);
-                overlay.style.display = 'none';
-                
-                // Abrir en nueva pestaña (mejor visor nativo de Android/iOS)
-                window.open(fileURL, '_blank');
-
-            } catch (e) {
-                console.error(e);
-                alert("Error al abrir el libro local.");
-                overlay.style.display = 'none';
-            }
-        }
-    }
-
-    renderLibrary('grid-local', localFiles);
+    // Inicializar
+    navigate('recientes');
 </script>
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
