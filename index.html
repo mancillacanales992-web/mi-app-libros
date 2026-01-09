@@ -10,10 +10,9 @@
     </script>
 
     <style>
-        /* --- UX --- */
         html, body { overscroll-behavior-y: contain; }
 
-        /* --- 1. SISTEMA DE TEMAS (Tus colores originales) --- */
+        /* --- 1. SISTEMA DE TEMAS ORIGINAL --- */
         :root {
             --bg-wall: #1e1e24; 
             --brick-1: #25252d; --brick-2: #2b2b36;
@@ -106,7 +105,6 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(10px)} to {opacity:1; transform:translateY(0)} }
 
-        /* Ajuste de Grid para 3 libros */
         .shelf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px 10px; padding: 15px 10px 70px 10px; overflow-y: auto; }
         
         .book-wrapper { 
@@ -114,14 +112,12 @@
             height: 160px; perspective: 600px; z-index: 10; padding-bottom: 12px; 
         }
         
+        /* CORRECCIÓN: Título oculto visualmente pero presente en código */
         .book-title {
-            font-size: 8px; text-align: center; margin-bottom: 6px; color: #fff; text-shadow: 0 1px 4px black;
-            font-weight: 600; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            z-index: 25; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.15); transform: translateZ(20px);
+            display: none; 
         }
 
-        /* --- PORTADAS PEQUEÑAS (FIXED) --- */
+        /* TAMAÑO FIJO Y PEQUEÑO */
         .book-cover {
             height: 120px !important; width: auto !important; max-width: 80px;           
             aspect-ratio: 2/3; object-fit: cover; border-radius: 2px;
@@ -136,18 +132,22 @@
         }
         .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
 
-        .delete-icon {
-            position: absolute; top: -5px; right: 5px; width: 20px; height: 20px;
-            background: #ff1744; color: white; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; z-index: 50;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid white; font-size: 12px;
+        /* ICONOS ADMIN (EDITAR / BORRAR) */
+        .admin-controls {
+            position: absolute; top: -15px; right: -10px; z-index: 50; display: flex; gap: 5px;
         }
+        .icon-btn {
+            width: 26px; height: 26px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            border: 1px solid white; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+        .delete-btn { background: #ff1744; color: white; }
+        .edit-btn { background: #ffea00; color: black; }
 
         /* --- ESTILOS VIDEOS Y VERSÍCULOS --- */
         .video-card {
             background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden;
-            margin-bottom: 20px; border: 1px solid var(--ui-border);
-            display: flex; flex-direction: column;
+            margin-bottom: 20px; border: 1px solid var(--ui-border); display: flex; flex-direction: column; position: relative;
         }
         .video-thumb {
             width: 100%; height: 180px; object-fit: cover; background: #000;
@@ -197,7 +197,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover;
         }
 
-        /* --- MODALS --- */
+        /* MODALS */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center;
@@ -205,7 +205,7 @@
         }
         .modal-content {
             background: #222; border: 1px solid var(--ui-border); border-radius: 16px;
-            padding: 30px; text-align: center; max-width: 300px; animation: popIn 0.3s;
+            padding: 30px; text-align: center; max-width: 300px; width:90%; animation: popIn 0.3s;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
@@ -247,6 +247,31 @@
         <h3 id="modal-title" style="color:var(--text-main); margin:0 0 10px 0;">¡Éxito!</h3>
         <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Operación realizada.</p>
         <button class="btn-neon" onclick="closeModal()">CERRAR</button>
+    </div>
+</div>
+
+<div id="edit-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color:var(--accent); margin-top:0">✏️ Editar</h3>
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-collection">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Título</label>
+        <input type="text" id="edit-title-input" class="input-box" style="margin-bottom:10px">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Descripción / Autor</label>
+        <textarea id="edit-desc-input" class="input-box" rows="3" style="margin-bottom:10px"></textarea>
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Link / URL</label>
+        <input type="text" id="edit-link-input" class="input-box" style="margin-bottom:10px">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Imagen Portada (URL)</label>
+        <input type="text" id="edit-img-input" class="input-box" style="margin-bottom:20px">
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn-neon" style="border-color:#555; color:#aaa" onclick="document.getElementById('edit-modal').style.display='none'">CANCELAR</button>
+            <button class="btn-neon" onclick="saveEdit()">GUARDAR</button>
+        </div>
     </div>
 </div>
 
@@ -493,7 +518,7 @@
 <script type="module">
     /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDLyZS-alUh5DOtBBtts-8D_hza-n71Y3I",
@@ -507,136 +532,67 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    /* --- 2. ESTADO GLOBAL --- */
+    /* --- 2. ESTADO GLOBAL (CORREGIDO PARA RECORDAR ADMIN) --- */
     let cloudBooks = []; 
     let youtubeVideos = [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
-    let isAdminMode = false; 
     
-    // Controladores de animación
-    let leavesInterval; 
-    let rainInterval;
+    // CORRECCIÓN: Leemos si ya eras admin antes de refrescar
+    let isAdminMode = localStorage.getItem('is_admin_active') === 'true'; 
+    
+    let leavesInterval, rainInterval; 
 
-    /* --- 3. CONEXIÓN A FIREBASE (TIEMPO REAL) --- */
+    /* --- 3. CONEXIÓN A BASE DE DATOS --- */
     
-    // A) Libros
+    // Libros
     onSnapshot(query(collection(db, "libros"), orderBy("timestamp", "desc")), (snapshot) => {
         cloudBooks = [];
         snapshot.forEach((doc) => cloudBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
         refreshActiveViews();
     });
 
-    // B) Videos
+    // Videos
     onSnapshot(query(collection(db, "videos"), orderBy("timestamp", "desc")), (snapshot) => {
         youtubeVideos = [];
         snapshot.forEach((doc) => youtubeVideos.push({ id: doc.id, ...doc.data() }));
         refreshActiveViews();
     });
 
-    // C) Versículo del Día
+    // Versículo
     onSnapshot(doc(db, "configuracion", "versiculo_diario"), (docSnap) => {
         renderVerse(docSnap.exists() ? docSnap.data() : null);
     });
 
     function refreshActiveViews() {
+        // Renderizar de nuevo para que aparezcan los botones si eres admin
         if(document.getElementById('recientes').classList.contains('active')) renderLibrary('grid-recientes', cloudBooks);
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
         if(document.getElementById('videos').classList.contains('active')) renderVideoList();
         if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
+        
+        // Asegurar que los formularios admin se vean si está activo
+        toggleAdminForms(isAdminMode);
     }
 
-    /* --- 4. NAVEGACIÓN Y ANIMACIONES --- */
-    window.toggleDrawer = function() { 
-        const d = document.getElementById('drawer');
-        d.classList.toggle('open'); 
-        document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; 
-    };
-
-    window.navigate = function(id) {
-        // Limpiar clases activas
-        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
-        
-        // Activar sección actual
-        const target = document.getElementById(id); 
-        if(target) target.classList.add('active');
-        
-        const tab = document.getElementById('tab-' + id); 
-        if(tab) tab.classList.add('active');
-        
-        // --- GESTIÓN DE CONTENIDO ---
-        if(id === 'favoritos') renderLibrary('grid-favoritos', favorites);
-        if(id === 'recientes' || id === 'nube') renderLibrary(id === 'recientes' ? 'grid-recientes' : 'grid-nube', cloudBooks);
-        
-        // --- GESTIÓN DE EFECTOS ---
-        
-        // Efecto Lluvia (Solo en Videos)
-        if(id === 'videos') {
-            renderVideoList();
-            startRain(); 
-        } else {
-            stopRain();
-        }
-        
-        // Efecto Hojas (Solo en Versículo)
-        if(id === 'versiculo') {
-            startFallingLeaves();
-        } else {
-            stopFallingLeaves();
-        }
-    };
-
-    window.searchBooks = function(q) {
-        const t = q.toLowerCase();
-        // Filtro Libros
-        const fBooks = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
-        renderLibrary('grid-recientes', fBooks);
-        renderLibrary('grid-nube', fBooks);
-        
-        // Filtro Videos
-        if(document.getElementById('videos').classList.contains('active')) {
-            const fVideos = youtubeVideos.filter(v => v.title.toLowerCase().includes(t));
-            renderVideoList(fVideos);
-        }
-    };
-
-    window.changeTheme = function(name, element) { 
-        document.body.className = name !== 'default' ? 'theme-'+name : ''; 
-        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-        if(element) element.classList.add('active');
-    };
-
-    /* --- 5. MODALS --- */
-    window.handleGenericForm = function(event, title, msg) {
-        event.preventDefault(); 
-        showModal(title, msg);
-        event.target.reset(); 
-    };
-
-    window.showModal = function(title, msg) {
-        document.getElementById('modal-title').innerText = title;
-        document.getElementById('modal-msg').innerText = msg;
-        document.getElementById('success-modal').style.display = 'flex';
-    };
-
-    window.closeModal = function() {
-        document.getElementById('success-modal').style.display = 'none';
-    };
-
-    /* --- 6. MODO ADMINISTRADOR --- */
+    /* --- 4. MODO ADMINISTRADOR (PERSISTENTE) --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
+            // Desactivar
             isAdminMode = false;
+            localStorage.setItem('is_admin_active', 'false'); // Guardar estado
             toggleAdminForms(false);
             alert("Modo Admin: DESACTIVADO");
             refreshActiveViews();
             return;
         }
+        
         const pass = prompt("🔒 Contraseña Admin:");
-        if (pass === 'admin123') {
+        if (pass === 'admin123') { 
+            // Activar
             isAdminMode = true;
+            localStorage.setItem('is_admin_active', 'true'); // Guardar estado
             toggleAdminForms(true);
-            alert("✅ Modo Admin: ACTIVADO");
+            alert("✅ Modo Admin: ACTIVADO (Se mantendrá al refrescar)");
             refreshActiveViews();
         } else {
             alert("⛔ Contraseña incorrecta.");
@@ -651,259 +607,216 @@
         if(verseForm) verseForm.style.display = display;
     }
 
-    /* --- 7. LÓGICA DE VIDEOS (YOUTUBE) --- */
-    window.uploadVideo = async function() {
-        const title = document.getElementById('vidTitle').value;
-        const desc = document.getElementById('vidDesc').value;
-        const url = document.getElementById('vidUrl').value;
-
-        if(!title || !url) return alert("Falta título o link");
-
-        try {
-            await addDoc(collection(db, "videos"), {
-                title: title, desc: desc, url: url,
-                timestamp: serverTimestamp()
-            });
-            showModal("Video Agregado", "Ya aparece en la lista.");
-            document.getElementById('vidTitle').value = "";
-            document.getElementById('vidDesc').value = "";
-            document.getElementById('vidUrl').value = "";
-        } catch (e) { alert("Error: " + e.message); }
-    };
-
-    // Función Inteligente para extraer ID de YouTube (Cualquier formato)
-    function getYoutubeId(url) {
-        if(!url) return null;
-        // Soporta youtu.be, youtube.com, embeds, etc.
-        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    function renderVideoList(list = youtubeVideos) {
-        const container = document.getElementById('video-list');
-        container.innerHTML = '';
-
-        if(list.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px">No hay videos disponibles.</p>';
-            return;
-        }
-
-        list.forEach(v => {
-            const videoId = getYoutubeId(v.url);
-            // Usamos img.youtube.com que es el servidor oficial de imágenes
-            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=No+Thumbnail';
-
-            const card = document.createElement('div');
-            card.className = 'video-card';
-            
-            // Botón eliminar solo para Admin
-            let deleteBtn = '';
-            if(isAdminMode) {
-                deleteBtn = `<button onclick="deleteItem('videos', '${v.id}')" style="background:#ff1744; color:white; border:none; width:100%; padding:10px; font-weight:bold; cursor:pointer; border-top:1px solid #555;">🗑️ ELIMINAR VIDEO</button>`;
-            }
-
-            card.innerHTML = `
-                <img src="${thumbUrl}" class="video-thumb" onclick="window.open('${v.url}', '_blank')" onerror="this.src='https://via.placeholder.com/480x360?text=Error'">
-                <div class="video-info">
-                    <div class="video-title">${v.title}</div>
-                    <div class="video-desc">${v.desc || ''}</div>
-                </div>
-                ${deleteBtn}
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    /* --- 8. LÓGICA VERSÍCULO (HOJAS) --- */
-    window.updateDailyVerse = async function() {
-        const title = document.getElementById('verseTitle').value;
-        const text = document.getElementById('verseText').value;
-        const img = document.getElementById('verseImgUrl').value;
-        
-        if(!text) return alert("Escribe el contenido del versículo");
-
-        try {
-            await setDoc(doc(db, "configuracion", "versiculo_diario"), {
-                title: title,
-                text: text,
-                image: img,
-                date: new Date().toLocaleDateString()
-            });
-            showModal("Actualizado", "El versículo ha sido publicado.");
-        } catch(e) { alert("Error: " + e.message); }
-    };
-
-    window.deleteDailyVerse = async function() {
-        if(!confirm("¿Borrar el versículo actual?")) return;
-        try {
-            await deleteDoc(doc(db, "configuracion", "versiculo_diario"));
-            showModal("Eliminado", "Sección de versículo limpiada.");
-        } catch(e) { alert("Error: " + e.message); }
-    };
-
-    function renderVerse(data) {
-        if(!data) {
-            document.getElementById('displayVerseTitle').innerText = "";
-            document.getElementById('displayVerseText').innerText = "No hay versículo publicado hoy.";
-            document.getElementById('displayVerseImg').style.display = 'none';
-            document.getElementById('verseDate').innerText = "";
-            return;
-        }
-
-        document.getElementById('displayVerseTitle').innerText = data.title || "Versículo Diario";
-        document.getElementById('displayVerseText').innerText = `"${data.text}"`;
-        document.getElementById('verseDate').innerText = "Fecha: " + (data.date || "Hoy");
-        
-        const imgEl = document.getElementById('displayVerseImg');
-        if(data.image) {
-            imgEl.src = data.image;
-            imgEl.style.display = 'block';
-        } else {
-            imgEl.style.display = 'none';
-        }
-    }
-
-    /* --- 9. ANIMACIONES (OPTIMIZADAS) --- */
+    /* --- 5. FUNCIONES DE EDICIÓN Y BORRADO --- */
     
-    // Hojas (Versículo)
-    function startFallingLeaves() {
-        const container = document.getElementById('versiculo-container');
-        if(leavesInterval) clearInterval(leavesInterval);
-
-        leavesInterval = setInterval(() => {
-            if(container.querySelectorAll('.leaf').length > 15) return; // Límite para rendimiento
-            const leaf = document.createElement('div');
-            leaf.className = 'leaf';
-            leaf.style.left = Math.random() * 90 + "%";
-            leaf.style.animationDuration = (Math.random() * 3 + 4) + "s";
-            leaf.onanimationend = () => leaf.remove();
-            container.appendChild(leaf);
-        }, 800);
-    }
-
-    function stopFallingLeaves() {
-        if(leavesInterval) clearInterval(leavesInterval);
-        const container = document.getElementById('versiculo-container');
-        if(container) container.querySelectorAll('.leaf').forEach(l => l.remove());
-    }
-
-    // Lluvia (Videos)
-    function startRain() {
-        const container = document.getElementById('videos');
-        if(rainInterval) clearInterval(rainInterval);
-
-        rainInterval = setInterval(() => {
-            if(container.querySelectorAll('.rain').length > 40) return;
-            const drop = document.createElement('div');
-            drop.className = 'rain';
-            drop.style.left = Math.random() * 100 + "%";
-            drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + "s";
-            drop.onanimationend = () => drop.remove();
-            container.appendChild(drop);
-        }, 100);
-    }
-
-    function stopRain() {
-        if(rainInterval) clearInterval(rainInterval);
-        const container = document.getElementById('videos');
-        if(container) container.querySelectorAll('.rain').forEach(r => r.remove());
-    }
-
-    /* --- 10. FUNCIONES GENÉRICAS --- */
+    // BORRAR (Para quitar tu imagen errónea)
     window.deleteItem = async function(collectionName, id) {
-        if(!confirm("⚠️ ¿Eliminar permanentemente?")) return;
+        if(event) event.stopPropagation(); // Evita abrir el libro al borrar
+        
+        if(!confirm("⚠️ ¿Estás seguro de ELIMINAR esto?")) return;
+        
         try {
             await deleteDoc(doc(db, collectionName, id));
-        } catch (e) { alert("Error: " + e.message); }
-    };
-
-    window.uploadBookToCloud = async function() {
-        const title = document.getElementById('pubTitle').value;
-        const author = document.getElementById('pubAuthor').value;
-        const link = document.getElementById('pubLink').value;
-        const cover = document.getElementById('pubCover').value;
-        const btn = document.querySelector('#publishForm .btn-neon');
-        
-        if(!title || !link) return alert("Faltan datos obligatorios");
-        
-        btn.innerText = "⏳ ...";
-        btn.disabled = true;
-        try {
-            await addDoc(collection(db, "libros"), {
-                title: title, author: author, pdfLink: link, cover: cover,
-                timestamp: serverTimestamp()
-            });
-            showModal("¡Publicado!", "Libro en la nube.");
-            document.getElementById('publishForm').reset();
-            window.navigate('recientes');
-        } catch (e) { alert("Error: " + e.message); }
-        finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; }
-    };
-
-    function renderLibrary(id, books) {
-        const c = document.getElementById(id);
-        c.innerHTML = '';
-        
-        if(!books || books.length === 0) { 
-            c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);margin-top:30px">No hay libros.</p>'; 
-            return; 
+            // No mostramos alert para que sea rápido, el elemento desaparecerá solo
+        } catch (e) {
+            alert("Error al borrar: " + e.message);
         }
+    };
+
+    // EDITAR (Abrir Modal)
+    window.openEditModal = function(collectionName, id) {
+        if(event) event.stopPropagation();
+
+        let item;
+        if (collectionName === 'libros') {
+            item = cloudBooks.find(b => b.id === id);
+            document.getElementById('edit-title-input').value = item.title || "";
+            document.getElementById('edit-desc-input').value = item.author || ""; 
+            document.getElementById('edit-link-input').value = item.pdfLink || "";
+            document.getElementById('edit-img-input').value = item.cover || "";
+        } else {
+            item = youtubeVideos.find(v => v.id === id);
+            document.getElementById('edit-title-input').value = item.title || "";
+            document.getElementById('edit-desc-input').value = item.desc || ""; 
+            document.getElementById('edit-link-input').value = item.url || "";
+            document.getElementById('edit-img-input').value = ""; 
+        }
+
+        if(item) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-collection').value = collectionName;
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+    };
+
+    // GUARDAR EDICIÓN
+    window.saveEdit = async function() {
+        const id = document.getElementById('edit-id').value;
+        const colName = document.getElementById('edit-collection').value;
+        const updateData = {
+            title: document.getElementById('edit-title-input').value
+        };
+
+        if(colName === 'libros') {
+            updateData.author = document.getElementById('edit-desc-input').value;
+            updateData.pdfLink = document.getElementById('edit-link-input').value;
+            updateData.cover = document.getElementById('edit-img-input').value;
+        } else {
+            updateData.desc = document.getElementById('edit-desc-input').value;
+            updateData.url = document.getElementById('edit-link-input').value;
+        }
+
+        try {
+            await updateDoc(doc(db, colName, id), updateData);
+            document.getElementById('edit-modal').style.display = 'none';
+            showModal("¡Corregido!", "Los cambios se guardaron.");
+        } catch(e) {
+            alert("Error: " + e.message);
+        }
+    };
+
+    /* --- 6. NAVEGACIÓN Y VISUALIZACIÓN --- */
+    window.toggleDrawer = function() { 
+        const d = document.getElementById('drawer');
+        d.classList.toggle('open'); 
+        document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; 
+    };
+
+    window.navigate = function(id) {
+        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(id).classList.add('active');
+        
+        // Activar pestaña visualmente
+        const tabs = document.querySelectorAll('.nav-tabs button');
+        if(id === 'recientes') tabs[0].classList.add('active');
+        if(id === 'nube') tabs[1].classList.add('active');
+        if(id === 'versiculo') tabs[2].classList.add('active');
+        if(id === 'videos') tabs[3].classList.add('active');
+        
+        refreshActiveViews();
+        
+        // Animaciones
+        if(id === 'videos') startRain(); else stopRain();
+        if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
+    };
+
+    window.searchBooks = function(q) {
+        const t = q.toLowerCase();
+        const fBooks = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
+        renderLibrary('grid-recientes', fBooks);
+        renderLibrary('grid-nube', fBooks);
+        if(document.getElementById('videos').classList.contains('active')) {
+            renderVideoList(youtubeVideos.filter(v => v.title.toLowerCase().includes(t)));
+        }
+    };
+
+    window.changeTheme = function(name, element) { 
+        document.body.className = name !== 'default' ? 'theme-'+name : ''; 
+        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+        if(element) element.classList.add('active');
+    };
+
+    /* --- 7. UTILS Y RENDERIZADO --- */
+    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
+    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
+    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
+
+    // Subir
+    window.uploadVideo = async function() {
+        const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value;
+        if(!t || !u) return alert("Faltan datos");
+        try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);}
+    };
+    window.uploadBookToCloud = async function() {
+        const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value;
+        const btn = document.querySelector('#publishForm .btn-neon');
+        if(!t || !l) return alert("Faltan datos");
+        btn.innerText = "⏳ ..."; btn.disabled = true;
+        try { await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); showModal("Listo", "Libro subido."); document.getElementById('publishForm').reset(); window.navigate('recientes'); } 
+        catch(e){alert(e.message);} finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; }
+    };
+
+    // Renderizado Libros
+    function renderLibrary(id, books) {
+        const c = document.getElementById(id); c.innerHTML = '';
+        if(!books.length) { c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#777">Vacío</p>'; return; }
 
         for(let i=0; i<books.length; i+=3) {
             books.slice(i, i+3).forEach(b => {
                 const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
-                const div = document.createElement('div'); 
-                div.className = 'book-wrapper';
+                const div = document.createElement('div'); div.className = 'book-wrapper';
                 
-                let coverHtml = '';
-                if (b.cover && b.cover.trim() !== "") {
-                    coverHtml = `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">`;
-                } else {
-                    coverHtml = `<div class="book-cover generated" style="background: linear-gradient(135deg, ${stringToColor(b.title)}, #222);"><span>${b.title}</span></div>`;
-                }
+                let coverHtml = b.cover ? `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null;this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">` : `<div class="book-cover generated" style="background:linear-gradient(135deg,${stringToColor(b.title)},#222)"><span>${b.title}</span></div>`;
 
-                let deleteBtn = '';
+                // Botones Admin (Si isAdminMode es true)
+                let adminBtns = '';
                 if (isAdminMode && b.type === 'cloud') {
-                    deleteBtn = `<div class="delete-icon" onclick="event.stopPropagation(); deleteItem('libros', '${b.id}')">🗑️</div>`;
+                    adminBtns = `<div class="admin-controls">
+                        <div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div>
+                        <div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div>
+                    </div>`;
                 }
 
-                div.innerHTML = `
-                    <div class="book-title">${b.title}</div>
-                    ${deleteBtn}
-                    <svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    ${coverHtml}
-                `;
-                
+                div.innerHTML = `<div class="book-title">${b.title}</div>${adminBtns}<svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${coverHtml}`;
                 div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
-                div.onclick = () => window.open(b.pdfLink, '_blank'); 
+                div.onclick = () => window.open(b.pdfLink, '_blank');
                 c.appendChild(div);
             });
             const s = document.createElement('div'); s.className = 'shelf-wood'; c.appendChild(s);
         }
     }
 
-    function stringToColor(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        let color = '#';
-        for (let i = 0; i < 3; i++) {
-            let value = (hash >> (i * 8)) & 0xFF;
-            color += ('00' + value.toString(16)).substr(-2);
-        }
-        return color;
+    // Renderizado Videos
+    function getYoutubeId(url) {
+        if(!url) return null;
+        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+    function renderVideoList(list = youtubeVideos) {
+        const c = document.getElementById('video-list'); c.innerHTML = '';
+        if(!list.length) { c.innerHTML = '<p style="text-align:center;color:#777">No hay videos</p>'; return; }
+        list.forEach(v => {
+            const vid = getYoutubeId(v.url);
+            const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
+            const card = document.createElement('div'); card.className = 'video-card';
+            
+            let adminBtns = '';
+            if(isAdminMode) {
+                adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
+                    <button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px; cursor:pointer; font-weight:bold;">✏️ EDITAR</button>
+                    <button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px; cursor:pointer; font-weight:bold;">🗑️ BORRAR</button>
+                </div>`;
+            }
+            card.innerHTML = `<img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')"><div class="video-info"><div class="video-title">${v.title}</div><div class="video-desc">${v.desc||''}</div></div>${adminBtns}`;
+            c.appendChild(card);
+        });
     }
 
-    function toggleFav(b, el) {
-        const idx = favorites.findIndex(f => f.title === b.title);
-        if(idx === -1) { favorites.push(b); if(el) el.classList.add('active'); }
-        else { favorites.splice(idx, 1); if(el) el.classList.remove('active'); 
-        if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites); }
-        localStorage.setItem('my_fav_books', JSON.stringify(favorites));
+    // Versículo y Animaciones
+    window.updateDailyVerse = async function() {
+        try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Versículo actualizado."); } catch(e){alert(e.message);}
+    };
+    window.deleteDailyVerse = async function() { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "configuracion", "versiculo_diario")); };
+    function renderVerse(d) {
+        if(!d) { document.getElementById('displayVerseTitle').innerText=""; document.getElementById('displayVerseText').innerText="Esperando..."; document.getElementById('displayVerseImg').style.display='none'; return; }
+        document.getElementById('displayVerseTitle').innerText=d.title; document.getElementById('displayVerseText').innerText=`"${d.text}"`; document.getElementById('verseDate').innerText=d.date;
+        const img=document.getElementById('displayVerseImg'); if(d.image){img.src=d.image; img.style.display='block';}else{img.style.display='none';}
     }
+    
+    function startFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); const c=document.getElementById('versiculo-container'); leavesInterval=setInterval(()=>{if(c.querySelectorAll('.leaf').length>15)return; const l=document.createElement('div');l.className='leaf';l.style.left=Math.random()*90+"%";l.style.animationDuration=(Math.random()*3+4)+"s";l.onanimationend=()=>l.remove();c.appendChild(l);},800); }
+    function stopFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); document.querySelectorAll('.leaf').forEach(e=>e.remove()); }
+    function startRain() { if(rainInterval) clearInterval(rainInterval); const c=document.getElementById('videos'); rainInterval=setInterval(()=>{if(c.querySelectorAll('.rain').length>40)return; const r=document.createElement('div');r.className='rain';r.style.left=Math.random()*100+"%";r.style.animationDuration=(Math.random()*0.5+0.5)+"s";r.onanimationend=()=>r.remove();c.appendChild(r);},100); }
+    function stopRain() { if(rainInterval) clearInterval(rainInterval); document.querySelectorAll('.rain').forEach(e=>e.remove()); }
 
-    // Inicializar
+    function stringToColor(str) { let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash); let c='#'; for(let i=0;i<3;i++) c+=('00'+((hash>>(i*8))&0xFF).toString(16)).substr(-2); return c; }
+    function toggleFav(b, el) { const idx=favorites.findIndex(f=>f.title===b.title); if(idx===-1){favorites.push(b);if(el)el.classList.add('active');}else{favorites.splice(idx,1);if(el)el.classList.remove('active');if(document.getElementById('favoritos').classList.contains('active'))renderLibrary('grid-favoritos',favorites);} localStorage.setItem('my_fav_books',JSON.stringify(favorites)); }
+
     navigate('recientes');
+    // Si ya era admin al recargar, mostrar controles
+    if(isAdminMode) toggleAdminForms(true);
 </script>
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
