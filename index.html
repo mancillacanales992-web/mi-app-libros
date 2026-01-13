@@ -28,7 +28,6 @@
             --comment-color: #b0bec5;
         }
         
-        /* Temas intactos */
         body.theme-orange { --bg-wall: #1a1008; --brick-1: #26170b; --brick-2: #331f0e; --ui-bg: rgba(255, 140, 0, 0.08); --ui-border: rgba(255, 140, 0, 0.3); --header-bg: rgba(26, 16, 8, 0.98); --text-main: #fff0e0; --text-muted: #d0b0a0; --accent: #ff6d00; --accent-glow: rgba(255, 109, 0, 0.4); }
         body.theme-silver { --bg-wall: #212121; --brick-1: #2c2c2c; --brick-2: #383838; --ui-bg: rgba(200, 200, 200, 0.08); --ui-border: rgba(200, 200, 200, 0.2); --header-bg: rgba(33, 33, 33, 0.98); --text-main: #ffffff; --text-muted: #9e9e9e; --accent: #b0bec5; --accent-glow: rgba(176, 190, 197, 0.3); }
         body.theme-red { --bg-wall: #1a0505; --brick-1: #290a0a; --brick-2: #380e0e; --ui-bg: rgba(255, 50, 50, 0.08); --ui-border: rgba(255, 82, 82, 0.3); --header-bg: rgba(26, 5, 5, 0.98); --text-main: #ffebee; --text-muted: #e57373; --accent: #ff1744; --accent-glow: rgba(255, 23, 68, 0.4); }
@@ -248,57 +247,38 @@
         .pdf-btn { background: none; border: none; color: white; font-size: 18px; padding: 10px; cursor: pointer; }
         .pdf-page-num { font-size: 14px; color: #ccc; }
 
-        /* 2. MURO SOCIAL (FEED TIPO FACEBOOK) */
+        /* 2. MURO SOCIAL */
         .social-feed-container { max-width: 600px; margin: 0 auto; padding-bottom: 50px; }
-        
-        .post-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border);
-            border-radius: 12px; padding: 15px; margin-bottom: 20px;
-        }
+        .post-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
         .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .user-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000;
-            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;
-        }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
         .post-info h4 { margin: 0; color: var(--text-main); font-size: 14px; }
         .post-info span { font-size: 11px; color: var(--text-muted); }
-        
         .post-content h3 { margin: 0 0 8px 0; color: var(--accent); font-size: 16px; }
         .post-content p { margin: 0; font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: #ddd; }
-        
-        .post-actions {
-            display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;
-        }
-        .action-btn {
-            flex: 1; background: none; border: none; color: var(--text-muted); cursor: pointer;
-            font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;
-            padding: 8px; border-radius: 5px; transition: 0.2s;
-        }
+        .post-actions { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
+        .action-btn { flex: 1; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 8px; border-radius: 5px; transition: 0.2s; }
         .action-btn:hover { background: rgba(255,255,255,0.05); color: white; }
         .action-btn.active-like { color: var(--like-color); }
-        .action-btn.active-dislike { color: var(--dislike-color); }
-        
         .comments-section { display: none; margin-top: 10px; padding-top: 10px; animation: fadeIn 0.3s; border-top: 1px solid rgba(255,255,255,0.05); }
-        .comment-item {
-            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 12px;
-        }
+        .comment-item { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 12px; }
         .comment-author { font-weight: bold; color: var(--accent); font-size: 11px; margin-bottom: 2px; }
 
-        /* 3. LISTA DE NOTAS GUARDADAS */
-        .saved-note-card {
-            background: var(--ui-bg); border-left: 3px solid var(--accent); padding: 15px;
-            margin-bottom: 10px; border-radius: 4px; position: relative;
-        }
+        /* 3. LISTA DE NOTAS */
+        .saved-note-card { background: var(--ui-bg); border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 10px; border-radius: 4px; position: relative; }
         .note-timestamp { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; display: block; }
         .note-preview { font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
-        .delete-note-btn {
-            position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff1744; cursor: pointer;
+        .delete-note-btn { position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff1744; cursor: pointer; }
+        .mini-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 10px; cursor: pointer; margin-left: 10px; }
+
+        /* 4. FAB - BOTÓN FLOTANTE (RESTAURADO) */
+        .fab-notes {
+            position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px;
+            background: var(--accent); border-radius: 50%; box-shadow: 0 4px 15px var(--accent-glow);
+            display: flex; align-items: center; justify-content: center; z-index: 800;
+            cursor: pointer; border: none; font-size: 24px; color: var(--bg-wall); transition: transform 0.2s;
         }
-        
-        .mini-btn {
-             background: transparent; border: 1px solid var(--accent); color: var(--accent);
-             padding: 4px 10px; border-radius: 12px; font-size: 10px; cursor: pointer; margin-left: 10px;
-        }
+        .fab-notes:active { transform: scale(0.9); }
 
     </style>
 </head>
@@ -309,9 +289,7 @@
     <div id="pdf-toolbar">
         <button class="pdf-btn" onclick="closePdfViewer()">✕</button>
         <span id="pdf-title" style="color:white; font-size:12px; font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width:100px;">Libro</span>
-        
         <button class="mini-btn" style="border-color:#fff; color:#fff; margin-right:10px" onclick="openNoteModalFromPdf()">✎ Anotar</button>
-
         <div style="display:flex; align-items:center; gap:5px">
             <button class="pdf-btn" onclick="changePdfPage(-1)">◀</button>
             <span class="pdf-page-num"><span id="page-num">--</span> / <span id="page-count">--</span></span>
@@ -435,11 +413,10 @@
             </div>
             
             <div class="glass-panel" style="margin:0 0 20px 0; padding:15px;">
-                <input type="text" id="post-title" class="input-box" placeholder="Título de tu publicación" style="margin-bottom:10px; padding:10px;">
-                <textarea id="post-content" class="input-box" rows="3" placeholder="¿Qué quieres compartir hoy?" style="margin-bottom:10px; padding:10px;"></textarea>
+                <input type="text" id="post-title" class="input-box" placeholder="Título" style="margin-bottom:10px; padding:10px;">
+                <textarea id="post-content" class="input-box" rows="3" placeholder="Comparte algo..." style="margin-bottom:10px; padding:10px;"></textarea>
                 <button class="btn-neon" onclick="createPost()">PUBLICAR</button>
             </div>
-
             <div id="feed-container" class="social-feed-container"></div>
         </div>
     </div>
@@ -569,6 +546,7 @@
         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda
     </button>
 </footer>
+<button class="fab-notes" onclick="openGeneralNote()">✎</button>
 <script type="module">
     /* --- 1. CONFIGURACIÓN FIREBASE & AUTH (CON REDIRECT) --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
@@ -588,23 +566,16 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    /* --- CORRECCIÓN LOGIN MÓVIL: RECUPERAR RESULTADO DEL REDIRECT --- */
-    getRedirectResult(auth)
-        .then((result) => {
-            if (result) {
-                console.log("Login exitoso tras redirección:", result.user);
-                // La sesión se manejará en onAuthStateChanged
-            }
-        }).catch((error) => {
-            console.error("Error en redirect login:", error);
-            // alert("Error de acceso: " + error.message); // Opcional
-        });
+    /* RECUPERAR SESIÓN EN MÓVILES TRAS REDIRECT */
+    getRedirectResult(auth).then((result) => {
+        if (result) console.log("Login móvil recuperado");
+    }).catch((error) => console.error(error));
 
     /* --- 2. ESTADO GLOBAL --- */
     let cloudBooks = []; 
     let youtubeVideos = [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
-    let savedNotes = JSON.parse(localStorage.getItem('my_saved_notes_v2')) || []; // NUEVA ESTRUCTURA DE NOTAS
+    let savedNotes = JSON.parse(localStorage.getItem('my_saved_notes_v2')) || [];
     let updateConfig = { status: 'off', title: '', msg: '', link: '' }; 
     let isAdminMode = localStorage.getItem('is_admin_active') === 'true'; 
     let hasShownUpdate = false; 
@@ -612,7 +583,6 @@
     let currentUser = null; 
 
     /* --- 3. CONEXIÓN A BASE DE DATOS --- */
-    
     // Libros
     onSnapshot(query(collection(db, "libros"), orderBy("timestamp", "desc")), (snapshot) => {
         cloudBooks = [];
@@ -657,7 +627,7 @@
         toggleAdminForms(isAdminMode);
     }
 
-    /* --- 4. MODO ADMINISTRADOR --- */
+    /* --- 4. FUNCIONES DE ADMIN --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
@@ -675,9 +645,7 @@
             alert("✅ Modo Admin: ACTIVADO");
             refreshActiveViews();
             if(updateConfig) populateAdminUpdateForm();
-        } else {
-            alert("⛔ Contraseña incorrecta.");
-        }
+        } else { alert("⛔ Incorrecta."); }
     };
 
     function populateAdminUpdateForm() {
@@ -686,7 +654,6 @@
         document.getElementById('updMsgInput').value = updateConfig.msg || '';
         document.getElementById('updLinkInput').value = updateConfig.link || '';
     }
-
     function toggleAdminForms(show) {
         const display = show ? 'block' : 'none';
         const vForm = document.getElementById('admin-video-form');
@@ -697,118 +664,63 @@
         if(updForm) updForm.style.display = display;
     }
 
-    /* --- 5. FUNCIONES CRUD GENERALES --- */
+    /* --- 5. UTILS CRUD --- */
     window.saveUpdateConfig = async function() {
-        const data = {
-            status: document.getElementById('updStatus').value,
-            title: document.getElementById('updTitleInput').value,
-            msg: document.getElementById('updMsgInput').value,
-            link: document.getElementById('updLinkInput').value
-        };
+        const data = { status: document.getElementById('updStatus').value, title: document.getElementById('updTitleInput').value, msg: document.getElementById('updMsgInput').value, link: document.getElementById('updLinkInput').value };
         try { await setDoc(doc(db, "configuracion", "alerta_update"), data); showModal("Guardado", "Alerta actualizada."); } catch(e) { alert(e.message); }
     };
-
-    window.deleteItem = async function(collectionName, id) {
+    window.deleteItem = async function(collectionName, id) { if(event) event.stopPropagation(); if(confirm("¿Eliminar?")) try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert(e.message); } };
+    
+    window.openEditModal = function(col, id) {
         if(event) event.stopPropagation();
-        if(!confirm("⚠️ ¿Estás seguro de ELIMINAR esto?")) return;
-        try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert("Error: " + e.message); }
+        let item = (col === 'libros') ? cloudBooks.find(b => b.id === id) : youtubeVideos.find(v => v.id === id);
+        if(!item) return;
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-collection').value = col;
+        document.getElementById('edit-title-input').value = item.title || "";
+        document.getElementById('edit-desc-input').value = (col==='libros') ? item.author : item.desc || "";
+        document.getElementById('edit-link-input').value = (col==='libros') ? item.pdfLink : item.url || "";
+        document.getElementById('edit-img-input').value = (col==='libros') ? item.cover : "";
+        document.getElementById('edit-modal').style.display = 'flex';
     };
-
-    window.openEditModal = function(collectionName, id) {
-        if(event) event.stopPropagation();
-        let item;
-        if (collectionName === 'libros') {
-            item = cloudBooks.find(b => b.id === id);
-            document.getElementById('edit-title-input').value = item.title || "";
-            document.getElementById('edit-desc-input').value = item.author || ""; 
-            document.getElementById('edit-link-input').value = item.pdfLink || "";
-            document.getElementById('edit-img-input').value = item.cover || "";
-        } else {
-            item = youtubeVideos.find(v => v.id === id);
-            document.getElementById('edit-title-input').value = item.title || "";
-            document.getElementById('edit-desc-input').value = item.desc || ""; 
-            document.getElementById('edit-link-input').value = item.url || "";
-            document.getElementById('edit-img-input').value = ""; 
-        }
-        if(item) {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-collection').value = collectionName;
-            document.getElementById('edit-modal').style.display = 'flex';
-        }
-    };
-
     window.saveEdit = async function() {
-        const id = document.getElementById('edit-id').value;
-        const colName = document.getElementById('edit-collection').value;
-        const updateData = { title: document.getElementById('edit-title-input').value };
-        if(colName === 'libros') {
-            updateData.author = document.getElementById('edit-desc-input').value;
-            updateData.pdfLink = document.getElementById('edit-link-input').value;
-            updateData.cover = document.getElementById('edit-img-input').value;
-        } else {
-            updateData.desc = document.getElementById('edit-desc-input').value;
-            updateData.url = document.getElementById('edit-link-input').value;
-        }
-        try { await updateDoc(doc(db, colName, id), updateData); document.getElementById('edit-modal').style.display = 'none'; showModal("¡Corregido!", "Cambios guardados."); } catch(e) { alert("Error: " + e.message); }
+        const id = document.getElementById('edit-id').value, col = document.getElementById('edit-collection').value;
+        const d = { title: document.getElementById('edit-title-input').value };
+        if(col === 'libros') { d.author = document.getElementById('edit-desc-input').value; d.pdfLink = document.getElementById('edit-link-input').value; d.cover = document.getElementById('edit-img-input').value; }
+        else { d.desc = document.getElementById('edit-desc-input').value; d.url = document.getElementById('edit-link-input').value; }
+        try { await updateDoc(doc(db, col, id), d); document.getElementById('edit-modal').style.display = 'none'; showModal("Listo", "Guardado."); } catch(e) { alert(e.message); }
     };
 
-    /* --- 6. NAVEGACIÓN Y VISUALIZACIÓN --- */
-    window.toggleDrawer = function() { 
-        const d = document.getElementById('drawer');
-        d.classList.toggle('open'); 
-        document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; 
-    };
-
+    /* --- 6. NAVEGACIÓN --- */
+    window.toggleDrawer = function() { const d = document.getElementById('drawer'); d.classList.toggle('open'); document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; };
     window.navigate = function(id) {
         document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
-        
         document.getElementById(id).classList.add('active');
-        
         const btnMap = {'recientes':0, 'nube':1, 'versiculo':2, 'videos':3, 'debate':4};
         const tabs = document.querySelectorAll('.nav-tabs button');
         if(btnMap[id] !== undefined) tabs[btnMap[id]].classList.add('active');
-        
         refreshActiveViews();
-        
         if(id === 'videos') startRain(); else stopRain();
         if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
     };
-
     window.searchBooks = function(q) {
         const t = q.toLowerCase();
         const fBooks = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
-        renderLibrary('grid-recientes', fBooks);
-        renderLibrary('grid-nube', fBooks);
-        if(document.getElementById('videos').classList.contains('active')) {
-            renderVideoList(youtubeVideos.filter(v => v.title.toLowerCase().includes(t)));
+        renderLibrary('grid-recientes', fBooks); renderLibrary('grid-nube', fBooks);
+    };
+    window.changeTheme = function(name, element) { document.body.className = name !== 'default' ? 'theme-'+name : ''; document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active')); if(element) element.classList.add('active'); };
+
+    /* --- 7. RENDERIZADO Y HELPERS (CORRECCIÓN PDF AQUÍ) --- */
+    
+    // HELPER: Convertir URLs de Drive de /view a descarga directa
+    function normalizeDriveUrl(url) {
+        if (url && url.includes('drive.google.com') && url.includes('/view')) {
+            // Reemplaza /file/d/XXX/view con /uc?export=download&id=XXX
+            return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=download&id=$1');
         }
-    };
-
-    window.changeTheme = function(name, element) { 
-        document.body.className = name !== 'default' ? 'theme-'+name : ''; 
-        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-        if(element) element.classList.add('active');
-    };
-
-    /* --- 7. UTILS Y RENDERIZADO (CON CORS PROXY FIX) --- */
-    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
-    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
-    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
-
-    window.uploadVideo = async function() {
-        const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value;
-        if(!t || !u) return alert("Faltan datos");
-        try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);}
-    };
-    window.uploadBookToCloud = async function() {
-        const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value;
-        const btn = document.querySelector('#publishForm .btn-neon');
-        if(!t || !l) return alert("Faltan datos");
-        btn.innerText = "⏳ ..."; btn.disabled = true;
-        try { await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); showModal("Listo", "Libro subido."); document.getElementById('publishForm').reset(); window.navigate('recientes'); } 
-        catch(e){alert(e.message);} finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; }
-    };
+        return url;
+    }
 
     function renderLibrary(id, books) {
         const c = document.getElementById(id); c.innerHTML = '';
@@ -820,21 +732,21 @@
                 const div = document.createElement('div'); div.className = 'book-wrapper';
                 
                 let coverHtml = b.cover ? `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null;this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">` : `<div class="book-cover generated" style="background:linear-gradient(135deg,${stringToColor(b.title)},#222)"><span>${b.title}</span></div>`;
-
                 let adminBtns = '';
                 if (isAdminMode && b.type === 'cloud') {
-                    adminBtns = `<div class="admin-controls">
-                        <div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div>
-                        <div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div>
-                    </div>`;
+                    adminBtns = `<div class="admin-controls"><div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div><div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div></div>`;
                 }
                 
-                /* === CORRECCIÓN CORS PROXY APLICADA AQUÍ === */
                 div.innerHTML = `<div class="book-title">${b.title}</div>${adminBtns}<svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${coverHtml}`;
                 div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
                 
-                // USAMOS CORSPROXY PARA EVITAR EL BLOQUEO
-                div.onclick = () => openPdfViewer('https://corsproxy.io/?' + encodeURIComponent(b.pdfLink), b.title); 
+                // === CORRECCIÓN MAESTRA DE PDF ===
+                // 1. Normalizar URL (Drive) -> 2. Encode -> 3. Proxy
+                div.onclick = () => {
+                    const cleanUrl = normalizeDriveUrl(b.pdfLink);
+                    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(cleanUrl);
+                    openPdfViewer(proxyUrl, b.title);
+                };
                 
                 c.appendChild(div);
             });
@@ -842,34 +754,20 @@
         }
     }
 
-    function getYoutubeId(url) {
-        if(!url) return null;
-        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-    function renderVideoList(list = youtubeVideos) {
+    function getYoutubeId(url) { const match = url.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (match&&match[2].length===11)?match[2]:null; }
+    function renderVideoList(list=youtubeVideos) {
         const c = document.getElementById('video-list'); c.innerHTML = '';
         if(!list.length) { c.innerHTML = '<p style="text-align:center;color:#777">No hay videos</p>'; return; }
         list.forEach(v => {
-            const vid = getYoutubeId(v.url);
-            const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
+            const vid = getYoutubeId(v.url), thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360';
             const card = document.createElement('div'); card.className = 'video-card';
-            let adminBtns = '';
-            if(isAdminMode) {
-                adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
-                    <button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px; cursor:pointer; font-weight:bold;">✏️ EDITAR</button>
-                    <button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px; cursor:pointer; font-weight:bold;">🗑️ BORRAR</button>
-                </div>`;
-            }
+            let adminBtns = isAdminMode ? `<div style="display:flex; border-top:1px solid #444; margin-top:auto;"><button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px;">✏️</button><button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px;">🗑️</button></div>` : '';
             card.innerHTML = `<img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')"><div class="video-info"><div class="video-title">${v.title}</div><div class="video-desc">${v.desc||''}</div></div>${adminBtns}`;
             c.appendChild(card);
         });
     }
 
-    window.updateDailyVerse = async function() {
-        try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Versículo actualizado."); } catch(e){alert(e.message);}
-    };
+    window.updateDailyVerse = async function() { try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Actualizado."); } catch(e){alert(e.message);} };
     window.deleteDailyVerse = async function() { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "configuracion", "versiculo_diario")); };
     function renderVerse(d) {
         if(!d) { document.getElementById('displayVerseTitle').innerText=""; document.getElementById('displayVerseText').innerText="Esperando..."; document.getElementById('displayVerseImg').style.display='none'; return; }
@@ -881,18 +779,24 @@
     function stopFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); document.querySelectorAll('.leaf').forEach(e=>e.remove()); }
     function startRain() { if(rainInterval) clearInterval(rainInterval); const c=document.getElementById('videos'); rainInterval=setInterval(()=>{if(c.querySelectorAll('.rain').length>40)return; const r=document.createElement('div');r.className='rain';r.style.left=Math.random()*100+"%";r.style.animationDuration=(Math.random()*0.5+0.5)+"s";r.onanimationend=()=>r.remove();c.appendChild(r);},100); }
     function stopRain() { if(rainInterval) clearInterval(rainInterval); document.querySelectorAll('.rain').forEach(e=>e.remove()); }
-
+    
+    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
+    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
+    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
+    window.uploadVideo = async function() { const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value; if(!t||!u)return alert("Faltan datos"); try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);} };
+    window.uploadBookToCloud = async function() { const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value; if(!t||!l)return alert("Datos"); try { await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); showModal("Listo", "Libro subido."); document.getElementById('publishForm').reset(); window.navigate('recientes'); } catch(e){alert(e.message);} };
+    
     function stringToColor(str) { let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash); let c='#'; for(let i=0;i<3;i++) c+=('00'+((hash>>(i*8))&0xFF).toString(16)).substr(-2); return c; }
     function toggleFav(b, el) { const idx=favorites.findIndex(f=>f.title===b.title); if(idx===-1){favorites.push(b);if(el)el.classList.add('active');}else{favorites.splice(idx,1);if(el)el.classList.remove('active');if(document.getElementById('favoritos').classList.contains('active'))renderLibrary('grid-favoritos',favorites);} localStorage.setItem('my_fav_books',JSON.stringify(favorites)); }
     /* ================================================================= */
-    /* === 8. LÓGICA NUEVA: AUTH, SOCIAL FEED, PDF Y NOTAS === */
+    /* === 8. LÓGICA DE NEGOCIO: AUTH, SOCIAL, PDF Y NOTAS === */
     /* ================================================================= */
 
-    /* --- A. AUTENTICACIÓN GOOGLE (FIX MÓVILES) --- */
+    /* --- A. AUTENTICACIÓN (REDIRECT PARA MÓVILES) --- */
     window.loginWithGoogle = async () => {
         try { 
             const provider = new GoogleAuthProvider(); 
-            // CAMBIO CLAVE: Usamos Redirect en lugar de Popup para evitar bloqueos en iOS/Android WebViews
+            // IMPORTANTE: Redirect soluciona fallos en navegadores integrados (Instagram/FB/WebViews)
             await signInWithRedirect(auth, provider); 
         } catch(e) { 
             alert("Error login: " + e.message); 
@@ -901,7 +805,6 @@
 
     window.logout = () => signOut(auth);
 
-    // Monitor de estado de usuario
     onAuthStateChanged(auth, (user) => {
         currentUser = user;
         const loginView = document.getElementById('chat-login-view');
@@ -911,26 +814,25 @@
             if(loginView) loginView.style.display = 'none';
             if(feedView) feedView.style.display = 'block';
             document.getElementById('user-name').innerText = user.displayName || "Anónimo";
-            initFeedListener(); // Iniciar el Muro Social
+            initFeedListener();
         } else {
             if(loginView) loginView.style.display = 'flex';
             if(feedView) feedView.style.display = 'none';
         }
     });
 
-    /* --- B. MURO SOCIAL (TIPO FACEBOOK) --- */
+    /* --- B. MURO SOCIAL (FEED + COMENTARIOS) --- */
     let unsubscribeFeed = null;
     const feedContainer = document.getElementById('feed-container');
 
     function initFeedListener() {
         if(unsubscribeFeed) unsubscribeFeed();
 
-        // Escuchar publicaciones ordenadas por fecha reciente
+        // Escuchar publicaciones
         const q = query(collection(db, "publicaciones"), orderBy("timestamp", "desc"), limit(20));
         
         unsubscribeFeed = onSnapshot(q, (snapshot) => {
             feedContainer.innerHTML = '';
-            
             if (snapshot.empty) {
                 feedContainer.innerHTML = '<div style="text-align:center;color:#777;padding:20px">Sé el primero en publicar algo hoy.</div>';
                 return;
@@ -939,9 +841,7 @@
             snapshot.forEach(docSnap => {
                 const post = docSnap.data();
                 const pid = docSnap.id;
-                const date = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Hace un momento';
-                
-                // Verificar si yo di like
+                const date = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Reciente';
                 const iLiked = post.likes && post.likes.includes(currentUser.uid);
                 
                 const div = document.createElement('div');
@@ -949,10 +849,7 @@
                 div.innerHTML = `
                     <div class="post-header">
                         <div class="user-avatar">${post.authorName.charAt(0)}</div>
-                        <div class="post-info">
-                            <h4>${post.authorName}</h4>
-                            <span>${date}</span>
-                        </div>
+                        <div class="post-info"><h4>${post.authorName}</h4><span>${date}</span></div>
                     </div>
                     <div class="post-content">
                         ${post.title ? `<h3>${post.title}</h3>` : ''}
@@ -960,7 +857,7 @@
                     </div>
                     <div class="post-actions">
                         <button class="action-btn ${iLiked ? 'active-like' : ''}" onclick="toggleLike('${pid}', ${iLiked})">
-                            ❤ ${post.likes ? post.likes.length : 0} Bendiciones
+                            ❤ ${post.likes ? post.likes.length : 0}
                         </button>
                         <button class="action-btn" onclick="toggleComments('${pid}')">
                             💬 Comentar
@@ -969,15 +866,13 @@
                     <div id="comments-${pid}" class="comments-section">
                         <div id="list-${pid}" style="margin-bottom:10px"></div>
                         <div style="display:flex; gap:5px">
-                            <input type="text" id="input-${pid}" class="input-box" style="margin:0; padding:8px; height:auto" placeholder="Escribe un comentario...">
+                            <input type="text" id="input-${pid}" class="input-box" style="margin:0; padding:8px; height:auto" placeholder="Comentario...">
                             <button class="mini-btn" onclick="addComment('${pid}')">Enviar</button>
                         </div>
                     </div>
                 `;
                 feedContainer.appendChild(div);
-                
-                // Cargar comentarios si la sección está abierta (o al crearse si queremos verlos)
-                loadComments(pid);
+                loadComments(pid); // Cargar subcolección
             });
         });
     }
@@ -985,93 +880,60 @@
     window.createPost = async () => {
         const title = document.getElementById('post-title').value.trim();
         const content = document.getElementById('post-content').value.trim();
-        
-        if(!content) return alert("Escribe algo para publicar.");
-
+        if(!content) return alert("Escribe algo.");
         try {
-            await addDoc(collection(db, "publicaciones"), {
-                uid: currentUser.uid,
-                authorName: currentUser.displayName,
-                title: title,
-                content: content,
-                timestamp: serverTimestamp(),
-                likes: []
-            });
-            document.getElementById('post-title').value = '';
-            document.getElementById('post-content').value = '';
+            await addDoc(collection(db, "publicaciones"), { uid: currentUser.uid, authorName: currentUser.displayName, title: title, content: content, timestamp: serverTimestamp(), likes: [] });
+            document.getElementById('post-title').value = ''; document.getElementById('post-content').value = '';
         } catch(e) { alert("Error: " + e.message); }
     };
 
     window.toggleLike = async (pid, currentlyLiked) => {
         const postRef = doc(db, "publicaciones", pid);
         try {
-            // Lógica simple de array: Si ya di like, lo quito. Si no, lo agrego.
-            // Nota: En producción idealmente usaríamos arrayUnion/arrayRemove de Firestore
-            // Aquí leemos el documento actual para simplificar la lógica en frontend
-            /* Se implementará como toggle simple en array local y update */
-            /* IMPORTANTE: Para hacerlo robusto usamos Firestore transactions o array operators, pero aquí simplificamos */
+            // Lectura y actualización simple (Optimista)
             const docSnap = await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js").then(mod => mod.getDoc(postRef));
             if(docSnap.exists()){
                 let likes = docSnap.data().likes || [];
-                if(currentlyLiked) {
-                    likes = likes.filter(uid => uid !== currentUser.uid);
-                } else {
-                    likes.push(currentUser.uid);
-                }
+                if(currentlyLiked) likes = likes.filter(uid => uid !== currentUser.uid);
+                else likes.push(currentUser.uid);
                 await updateDoc(postRef, { likes: likes });
             }
         } catch(e) { console.error(e); }
     };
 
-    window.toggleComments = (pid) => {
-        const section = document.getElementById(`comments-${pid}`);
-        section.style.display = section.style.display === 'block' ? 'none' : 'block';
-    };
+    window.toggleComments = (pid) => { const s = document.getElementById(`comments-${pid}`); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
 
     window.addComment = async (pid) => {
         const input = document.getElementById(`input-${pid}`);
         const text = input.value.trim();
         if(!text) return;
-        
-        try {
-            await addDoc(collection(db, "publicaciones", pid, "comentarios"), {
-                uid: currentUser.uid,
-                authorName: currentUser.displayName,
-                text: text,
-                timestamp: serverTimestamp()
-            });
-            input.value = '';
-        } catch(e) { console.error(e); }
+        try { await addDoc(collection(db, "publicaciones", pid, "comentarios"), { uid: currentUser.uid, authorName: currentUser.displayName, text: text, timestamp: serverTimestamp() }); input.value = ''; } catch(e) { console.error(e); }
     };
 
     function loadComments(pid) {
         const listDiv = document.getElementById(`list-${pid}`);
         const q = query(collection(db, "publicaciones", pid, "comentarios"), orderBy("timestamp", "asc"));
-        
         onSnapshot(q, (snap) => {
             listDiv.innerHTML = '';
             snap.forEach(doc => {
                 const c = doc.data();
-                const div = document.createElement('div');
-                div.className = 'comment-item';
+                const div = document.createElement('div'); div.className = 'comment-item';
                 div.innerHTML = `<div class="comment-author">${c.authorName}</div>${c.text}`;
                 listDiv.appendChild(div);
             });
         });
     }
 
-    /* --- C. LECTOR PDF.JS & BOTÓN NOTAS --- */
+    /* --- C. MOTOR PDF.JS --- */
     let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null, scale = 1.2;
     const canvas = document.getElementById('the-canvas');
     const ctx = canvas.getContext('2d');
-    
-    // Variable global para saber de qué estamos tomando notas
     let currentNoteContext = "Nota General"; 
 
     window.openPdfViewer = (url, title) => {
         document.getElementById('pdf-viewer-modal').style.display = 'flex';
         document.getElementById('pdf-title').innerText = title || "Documento";
-        currentNoteContext = "Libro: " + (title || "Desconocido"); // Contexto para la nota
+        currentNoteContext = "Libro: " + (title || "Desconocido");
         
         pdfjsLib.getDocument(url).promise.then((pdf) => {
             pdfDoc = pdf;
@@ -1080,7 +942,7 @@
             renderPage(pageNum);
         }).catch(err => {
             console.error("Error PDF:", err);
-            alert("No se pudo cargar. Revisa tu conexión.");
+            alert("No se pudo cargar el PDF. Verifica que el link sea público.");
             closePdfViewer();
         });
     };
@@ -1099,18 +961,9 @@
         });
         document.getElementById('page-num').textContent = num;
     }
-
     window.queueRenderPage = (num) => { if (pageRendering) pageNumPending = num; else renderPage(num); };
-    window.changePdfPage = (offset) => {
-        if (!pdfDoc) return;
-        const newPage = pageNum + offset;
-        if (newPage >= 1 && newPage <= pdfDoc.numPages) { pageNum = newPage; queueRenderPage(pageNum); }
-    };
-    window.closePdfViewer = () => {
-        document.getElementById('pdf-viewer-modal').style.display = 'none';
-        pdfDoc = null; ctx.clearRect(0, 0, canvas.width, canvas.height);
-        currentNoteContext = "Nota General"; // Reset contexto
-    };
+    window.changePdfPage = (offset) => { if (!pdfDoc) return; const newPage = pageNum + offset; if (newPage >= 1 && newPage <= pdfDoc.numPages) { pageNum = newPage; queueRenderPage(pageNum); } };
+    window.closePdfViewer = () => { document.getElementById('pdf-viewer-modal').style.display = 'none'; pdfDoc = null; ctx.clearRect(0, 0, canvas.width, canvas.height); currentNoteContext = "Nota General"; };
 
     /* --- D. GESTIÓN DE NOTAS (LOCALSTORAGE) --- */
     window.openNoteModalFromPdf = () => {
@@ -1119,7 +972,7 @@
         document.getElementById('notes-modal').style.display = 'flex';
     };
 
-    // Si abren notas desde el menú principal
+    // FUNCIÓN PARA EL FAB (LÁPIZ)
     window.openGeneralNote = () => {
         currentNoteContext = "Nota General";
         document.getElementById('note-context-label').innerText = currentNoteContext;
@@ -1131,20 +984,12 @@
         const text = document.getElementById('current-note-text').value.trim();
         if(!text) return;
 
-        const newNote = {
-            id: Date.now(),
-            text: text,
-            context: currentNoteContext,
-            date: new Date().toLocaleDateString()
-        };
-
-        savedNotes.unshift(newNote); // Agregar al inicio
+        const newNote = { id: Date.now(), text: text, context: currentNoteContext, date: new Date().toLocaleDateString() };
+        savedNotes.unshift(newNote); 
         localStorage.setItem('my_saved_notes_v2', JSON.stringify(savedNotes));
         
         document.getElementById('notes-modal').style.display = 'none';
         showModal("Nota Guardada", "Se ha añadido a 'Mis Notas'.");
-        
-        // Si estamos en la vista de notas, refrescar
         if(document.getElementById('mis-notas').classList.contains('active')) renderSavedNotes();
     };
 
@@ -1158,25 +1003,16 @@
     function renderSavedNotes() {
         const container = document.getElementById('saved-notes-list');
         container.innerHTML = '';
-        
-        if(savedNotes.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#777">No tienes notas guardadas aún.</p>';
-            return;
-        }
-
+        if(savedNotes.length === 0) { container.innerHTML = '<p style="text-align:center; color:#777">No tienes notas guardadas aún.</p>'; return; }
         savedNotes.forEach(note => {
             const div = document.createElement('div');
             div.className = 'saved-note-card';
-            div.innerHTML = `
-                <button class="delete-note-btn" onclick="deleteNote(${note.id})">🗑️</button>
-                <span class="note-timestamp">${note.date} - ${note.context}</span>
-                <div class="note-preview">${note.text}</div>
-            `;
+            div.innerHTML = `<button class="delete-note-btn" onclick="deleteNote(${note.id})">🗑️</button><span class="note-timestamp">${note.date} - ${note.context}</span><div class="note-preview">${note.text}</div>`;
             container.appendChild(div);
         });
     }
 
-    /* --- 9. INICIALIZACIÓN FINAL --- */
+    /* --- 9. INIT --- */
     navigate('recientes');
     if(isAdminMode) toggleAdminForms(true);
 
@@ -1184,4 +1020,3 @@
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
 </html>
-
