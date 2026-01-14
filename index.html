@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>La Verdad de Dios - App Ultimate</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
 
     <style>
         html, body { overscroll-behavior-y: contain; }
 
-        /* --- 1. SISTEMA DE TEMAS --- */
+        /* --- 1. SISTEMA DE TEMAS (BASE) --- */
         :root {
             --bg-wall: #1e1e24; 
             --brick-1: #25252d; --brick-2: #2b2b36;
@@ -21,13 +17,11 @@
             --header-bg: rgba(30, 30, 36, 0.98);
             --text-main: #f0f0f0; --text-muted: #b0b0b0;
             --accent: #00e5ff; --accent-glow: rgba(0, 229, 255, 0.25);
-            
-            /* Colores Social Feed */
-            --like-color: #2979ff;
-            --dislike-color: #ff1744;
-            --comment-color: #b0bec5;
+            /* Colores Feed */
+            --like-color: #00e676;
+            --disagree-color: #ff1744;
         }
-        
+        /* Temas (Intactos) */
         body.theme-orange { --bg-wall: #1a1008; --brick-1: #26170b; --brick-2: #331f0e; --ui-bg: rgba(255, 140, 0, 0.08); --ui-border: rgba(255, 140, 0, 0.3); --header-bg: rgba(26, 16, 8, 0.98); --text-main: #fff0e0; --text-muted: #d0b0a0; --accent: #ff6d00; --accent-glow: rgba(255, 109, 0, 0.4); }
         body.theme-silver { --bg-wall: #212121; --brick-1: #2c2c2c; --brick-2: #383838; --ui-bg: rgba(200, 200, 200, 0.08); --ui-border: rgba(200, 200, 200, 0.2); --header-bg: rgba(33, 33, 33, 0.98); --text-main: #ffffff; --text-muted: #9e9e9e; --accent: #b0bec5; --accent-glow: rgba(176, 190, 197, 0.3); }
         body.theme-red { --bg-wall: #1a0505; --brick-1: #290a0a; --brick-2: #380e0e; --ui-bg: rgba(255, 50, 50, 0.08); --ui-border: rgba(255, 82, 82, 0.3); --header-bg: rgba(26, 5, 5, 0.98); --text-main: #ffebee; --text-muted: #e57373; --accent: #ff1744; --accent-glow: rgba(255, 23, 68, 0.4); }
@@ -52,7 +46,112 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        /* --- UI COMPONENTES --- */
+        /* --- 2. MODAL DE NOTAS (REDISEÑO GLASS/MODERNO) --- */
+        #notes-modal .modal-content {
+            background: rgba(20, 20, 25, 0.95); /* Fondo oscuro profundo */
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--accent); /* Borde neón */
+            box-shadow: 0 0 25px rgba(0,0,0,0.8), 0 0 10px var(--accent-glow);
+            max-width: 90%; width: 350px;
+            border-radius: 20px;
+        }
+        
+        .notes-textarea {
+            width: 100%; box-sizing: border-box;
+            background: rgba(255,255,255,0.05); /* Ligeramente visible */
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 15px;
+            color: #eee; font-family: 'Courier New', monospace; /* Estilo máquina */
+            font-size: 14px; line-height: 1.5; resize: none; outline: none;
+            margin-top: 10px; transition: 0.3s;
+        }
+        .notes-textarea:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* --- 3. MODAL DE PERFIL (ONBOARDING) --- */
+        #profile-setup-modal { z-index: 10000; } /* Encima de todo */
+        
+        .avatar-grid {
+            display: flex; justify-content: center; gap: 10px; margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .avatar-option {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); font-size: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid transparent; transition: 0.3s;
+        }
+        .avatar-option:hover { background: rgba(255,255,255,0.2); }
+        .avatar-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* --- 4. ESTILOS MURO SOCIAL --- */
+        .social-feed { display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
+        
+        .create-post-card {
+            background: var(--ui-bg); border: 1px solid var(--ui-border); 
+            border-radius: 12px; padding: 15px; margin-bottom: 20px;
+        }
+        
+        .social-card { 
+            background: rgba(30, 30, 36, 0.6); border: 1px solid var(--ui-border); 
+            border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.3s; position: relative;
+        }
+
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .post-avatar { 
+            width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.1); 
+            color: #fff; font-weight: bold; display: flex; align-items: center; 
+            justify-content: center; font-size: 18px; border: 1px solid var(--ui-border);
+        }
+        .post-meta { flex: 1; }
+        .post-author { font-size: 14px; font-weight: bold; color: var(--text-main); display: block; }
+        .post-date { font-size: 11px; color: var(--text-muted); }
+        
+        /* Botón Admin Borrar */
+        .post-del-btn { 
+            color: var(--disagree-color); background: rgba(255, 23, 68, 0.1); 
+            border: 1px solid var(--disagree-color); border-radius: 5px;
+            font-size: 14px; cursor: pointer; padding: 5px 10px; 
+            position: absolute; top: 15px; right: 15px;
+        }
+
+        .post-title { font-size: 17px; color: var(--accent); margin: 8px 0; font-weight: bold; }
+        .post-body { font-size: 14px; line-height: 1.5; color: #ddd; margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word;}
+
+        .social-actions { 
+            display: flex; gap: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; 
+        }
+        .action-btn { 
+            flex: 1; background: rgba(255,255,255,0.05); border: none; color: var(--text-muted); 
+            padding: 8px; border-radius: 20px; font-size: 12px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; 
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.15); }
+        .action-btn.liked { color: var(--like-color); background: rgba(0, 230, 118, 0.1); font-weight: bold; }
+        .action-btn.disagreed { color: var(--disagree-color); background: rgba(255, 23, 68, 0.1); font-weight: bold; }
+
+        .comments-section { 
+            display: none; margin-top: 15px; padding-top: 10px; 
+            border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s;
+        }
+        .comment-item { 
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; 
+            margin-bottom: 8px; font-size: 13px; border-left: 2px solid var(--ui-border);
+        }
+        .comment-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .comment-author { color: var(--accent); font-weight: bold; font-size: 12px; }
+        .comment-text { color: var(--text-main); line-height: 1.3; }
+
+        /* --- UI COMPONENTES GENERALES --- */
         .glass-panel {
             background: var(--ui-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--ui-border); border-radius: 16px; padding: 25px; margin: 15px;
@@ -92,6 +191,7 @@
             background: white; color: #333; border: none; padding: 12px; width: 100%; 
             border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; 
             align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .app-header {
@@ -105,10 +205,9 @@
         }
         .search-box input { background: transparent; border: none; width: 100%; outline: none; color: white; }
         
-        .nav-tabs { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--ui-border); overflow-x: auto; white-space: nowrap; }
-        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tabs { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--ui-border); }
         .nav-tabs button {
-            flex: 1; min-width: 70px; padding: 15px 0; background: none; border: none; font-size: 11px; font-weight: 700;
+            flex: 1; padding: 15px 0; background: none; border: none; font-size: 11px; font-weight: 700;
             color: var(--text-muted); text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s;
         }
         .nav-tabs button.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
@@ -123,7 +222,9 @@
             position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
             height: 160px; perspective: 600px; z-index: 10; padding-bottom: 12px; 
         }
+        
         .book-title { display: none; }
+
         .book-cover {
             height: 120px !important; width: auto !important; max-width: 80px;           
             aspect-ratio: 2/3; object-fit: cover; border-radius: 2px;
@@ -138,7 +239,9 @@
         }
         .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
 
-        .admin-controls { position: absolute; top: -15px; right: -10px; z-index: 50; display: flex; gap: 5px; }
+        .admin-controls {
+            position: absolute; top: -15px; right: -10px; z-index: 50; display: flex; gap: 5px;
+        }
         .icon-btn {
             width: 26px; height: 26px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; cursor: pointer;
@@ -151,7 +254,10 @@
             background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden;
             margin-bottom: 20px; border: 1px solid var(--ui-border); display: flex; flex-direction: column; position: relative;
         }
-        .video-thumb { width: 100%; height: 180px; object-fit: cover; background: #000; display: block; cursor: pointer; }
+        .video-thumb {
+            width: 100%; height: 180px; object-fit: cover; background: #000;
+            display: block; cursor: pointer;
+        }
         .video-info { padding: 15px; }
         .video-title { font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
         .video-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
@@ -186,9 +292,12 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-top: 40px; z-index: 10;
             max-width: 90%; width: 100%; box-sizing: border-box;
         }
-        .verse-img { width: 100%; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover; }
+        .verse-img {
+            width: 100%; border-radius: 10px; margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover;
+        }
 
-        /* MODALS */
+        /* MODALS (GENERAL) */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center;
@@ -201,7 +310,21 @@
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* MENÚ & FOOTER */
+        /* Botones de Notas (Ubicación) */
+        .header-note-btn { 
+            background: none; border: 1px solid var(--accent); color: var(--accent); 
+            border-radius: 50%; width: 32px; height: 32px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; margin-left: 10px; 
+            font-size: 16px; transition: 0.3s;
+        }
+        .intro-note-btn { 
+            background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent); 
+            color: var(--text-main); width: 100%; padding: 12px; border-radius: 8px; 
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center; 
+            gap: 10px; cursor: pointer; font-weight: bold; font-size: 14px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
         .drawer {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
             background: var(--bg-wall); color: var(--text-main); z-index: 2000; transition: 0.3s;
@@ -227,89 +350,44 @@
         .fav-heart { position: absolute; top: 5px; right: 5px; z-index: 30; fill: rgba(255,255,255,0.7); filter: drop-shadow(0 2px 2px black); }
         .fav-heart.active { fill: #ff0055; filter: drop-shadow(0 0 8px #ff0055); }
 
-        /* ================================================================= */
-        /* === ESTILOS NUEVOS: LECTOR, SOCIAL FEED, NOTAS (FASE 2) === */
-        /* ================================================================= */
-
-        /* 1. LECTOR PDF FULLSCREEN */
-        #pdf-viewer-modal {
-            display: none; position: fixed; inset: 0; z-index: 9999;
-            background: #121212; flex-direction: column;
-        }
-        #pdf-toolbar {
-            height: 50px; background: #1a1a1a; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 10px; border-bottom: 1px solid #333;
-        }
-        #pdf-canvas-container {
-            flex: 1; overflow: auto; display: flex; justify-content: center; align-items: flex-start;
-            padding: 20px; background: #000;
-        }
-        .pdf-btn { background: none; border: none; color: white; font-size: 18px; padding: 10px; cursor: pointer; }
-        .pdf-page-num { font-size: 14px; color: #ccc; }
-
-        /* 2. MURO SOCIAL */
-        .social-feed-container { max-width: 600px; margin: 0 auto; padding-bottom: 50px; }
-        .post-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-        .post-info h4 { margin: 0; color: var(--text-main); font-size: 14px; }
-        .post-info span { font-size: 11px; color: var(--text-muted); }
-        .post-content h3 { margin: 0 0 8px 0; color: var(--accent); font-size: 16px; }
-        .post-content p { margin: 0; font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: #ddd; }
-        .post-actions { display: flex; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
-        .action-btn { flex: 1; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 8px; border-radius: 5px; transition: 0.2s; }
-        .action-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-        .action-btn.active-like { color: var(--like-color); }
-        .comments-section { display: none; margin-top: 10px; padding-top: 10px; animation: fadeIn 0.3s; border-top: 1px solid rgba(255,255,255,0.05); }
-        .comment-item { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 12px; }
-        .comment-author { font-weight: bold; color: var(--accent); font-size: 11px; margin-bottom: 2px; }
-
-        /* 3. LISTA DE NOTAS */
-        .saved-note-card { background: var(--ui-bg); border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 10px; border-radius: 4px; position: relative; }
-        .note-timestamp { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; display: block; }
-        .note-preview { font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
-        .delete-note-btn { position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff1744; cursor: pointer; }
-        .mini-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-size: 10px; cursor: pointer; margin-left: 10px; }
-
-        /* 4. FAB - BOTÓN FLOTANTE (RESTAURADO) */
-        .fab-notes {
-            position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px;
-            background: var(--accent); border-radius: 50%; box-shadow: 0 4px 15px var(--accent-glow);
-            display: flex; align-items: center; justify-content: center; z-index: 800;
-            cursor: pointer; border: none; font-size: 24px; color: var(--bg-wall); transition: transform 0.2s;
-        }
-        .fab-notes:active { transform: scale(0.9); }
-
     </style>
 </head>
 <body>
-<div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
 
-<div id="pdf-viewer-modal">
-    <div id="pdf-toolbar">
-        <button class="pdf-btn" onclick="closePdfViewer()">✕</button>
-        <span id="pdf-title" style="color:white; font-size:12px; font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width:100px;">Libro</span>
-        <button class="mini-btn" style="border-color:#fff; color:#fff; margin-right:10px" onclick="openNoteModalFromPdf()">✎ Anotar</button>
-        <div style="display:flex; align-items:center; gap:5px">
-            <button class="pdf-btn" onclick="changePdfPage(-1)">◀</button>
-            <span class="pdf-page-num"><span id="page-num">--</span> / <span id="page-count">--</span></span>
-            <button class="pdf-btn" onclick="changePdfPage(1)">▶</button>
-        </div>
-    </div>
-    <div id="pdf-canvas-container">
-        <canvas id="the-canvas"></canvas>
-    </div>
-</div>
+<div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
 
 <div id="notes-modal" class="modal-overlay">
     <div class="modal-content">
-        <h3 style="color:var(--accent); margin-top:0;">📝 Nueva Nota</h3>
-        <p id="note-context-label" style="font-size:11px; color:var(--text-muted); margin-bottom:10px">Nota General</p>
-        <textarea id="current-note-text" rows="6" class="input-box" placeholder="Escribe aquí..."></textarea>
+        <h3 style="color:var(--accent); margin-top:0; font-family:'Courier New', monospace;">📝 BLOC DE NOTAS</h3>
+        <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">Guardado Localmente</p>
+        <textarea id="user-notes" class="notes-textarea" rows="10" placeholder="Escribe tus pensamientos, versículos o ideas..."></textarea>
         <div style="display:flex; gap:10px; margin-top:15px; justify-content:flex-end;">
-            <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:12px; padding:8px" onclick="document.getElementById('notes-modal').style.display='none'">CANCELAR</button>
-            <button class="btn-neon" style="font-size:12px; padding:8px" onclick="saveCurrentNote()">GUARDAR</button>
+            <button class="btn-neon" style="border-color:rgba(255,255,255,0.2); color:#aaa; font-size:11px; padding:8px 15px;" onclick="document.getElementById('notes-modal').style.display='none'">CERRAR</button>
+            <button class="btn-neon" style="font-size:11px; padding:8px 15px; background:var(--accent-glow);" onclick="saveNotes()">GUARDAR</button>
         </div>
+    </div>
+</div>
+
+<div id="profile-setup-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="font-size:40px; margin-bottom:10px">👋</div>
+        <h3 style="color:var(--accent); margin:0 0 5px 0;">¡Bienvenido/a!</h3>
+        <p style="color:var(--text-main); font-size:13px; margin-bottom:20px;">Configura tu perfil para la comunidad.</p>
+        
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">TU APODO / NICKNAME</label>
+        <input type="text" id="profile-nick" class="input-box" style="margin-top:0; text-align:center;" placeholder="Ej: Juan_316">
+        
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:10px;">ELIGE TU AVATAR</label>
+        <div class="avatar-grid">
+            <div class="avatar-option" onclick="selectAvatar('👨', this)">👨</div>
+            <div class="avatar-option" onclick="selectAvatar('👩', this)">👩</div>
+            <div class="avatar-option" onclick="selectAvatar('👦', this)">👦</div>
+            <div class="avatar-option" onclick="selectAvatar('👧', this)">👧</div>
+            <div class="avatar-option" onclick="selectAvatar('👤', this)">👤</div>
+        </div>
+        <input type="hidden" id="selected-avatar-val">
+
+        <button class="btn-neon" onclick="saveUserProfile()">GUARDAR Y CONTINUAR</button>
     </div>
 </div>
 
@@ -317,9 +395,11 @@
     <div class="modal-content">
         <div style="font-size:40px; margin-bottom:10px">🚀</div>
         <h3 id="upd-title" style="color:var(--accent); margin:0 0 10px 0;">Nueva Versión</h3>
-        <p id="upd-msg" style="color:var(--text-main); font-size:14px; margin-bottom:20px;">Actualización disponible.</p>
-        <button id="upd-btn" class="btn-neon">DESCARGAR</button>
-        <div style="margin-top:15px;"><button onclick="document.getElementById('update-modal').style.display='none'" style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;">Cerrar</button></div>
+        <p id="upd-msg" style="color:var(--text-main); font-size:14px; margin-bottom:20px;">Hay una actualización disponible.</p>
+        <button id="upd-btn" class="btn-neon">DESCARGAR AHORA</button>
+        <div style="margin-top:15px;">
+            <button onclick="document.getElementById('update-modal').style.display='none'" style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;">Quizás luego</button>
+        </div>
     </div>
 </div>
 
@@ -335,11 +415,21 @@
 <div id="edit-modal" class="modal-overlay">
     <div class="modal-content">
         <h3 style="color:var(--accent); margin-top:0">✏️ Editar</h3>
-        <input type="hidden" id="edit-id"><input type="hidden" id="edit-collection">
-        <input type="text" id="edit-title-input" class="input-box" placeholder="Título" style="margin-bottom:10px">
-        <textarea id="edit-desc-input" class="input-box" rows="3" placeholder="Desc/Autor" style="margin-bottom:10px"></textarea>
-        <input type="text" id="edit-link-input" class="input-box" placeholder="Link" style="margin-bottom:10px">
-        <input type="text" id="edit-img-input" class="input-box" placeholder="Imagen URL" style="margin-bottom:20px">
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-collection">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Título</label>
+        <input type="text" id="edit-title-input" class="input-box" style="margin-bottom:10px">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Descripción / Autor</label>
+        <textarea id="edit-desc-input" class="input-box" rows="3" style="margin-bottom:10px"></textarea>
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Link / URL</label>
+        <input type="text" id="edit-link-input" class="input-box" style="margin-bottom:10px">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Imagen Portada (URL)</label>
+        <input type="text" id="edit-img-input" class="input-box" style="margin-bottom:20px">
+        
         <div style="display:flex; gap:10px;">
             <button class="btn-neon" style="border-color:#555; color:#aaa" onclick="document.getElementById('edit-modal').style.display='none'">CANCELAR</button>
             <button class="btn-neon" onclick="saveEdit()">GUARDAR</button>
@@ -349,88 +439,65 @@
 
 <div id="drawer" class="drawer">
     <div class="drawer-header">
-        <h2 style="margin:0; color:var(--accent);">Mi Biblioteca</h2>
+        <h2 style="margin:0; color:var(--accent); text-shadow:0 0 10px var(--accent-glow)">Mi Biblioteca</h2>
         <small style="color:var(--text-muted)">La verdad de Dios, al alcance de todos</small>
     </div>
     <div style="flex:1; overflow-y:auto">
         <div class="drawer-item" onclick="navigate('recientes'); toggleDrawer()"><svg class="icon"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio</div>
-        <div class="drawer-item" onclick="navigate('mis-notas'); toggleDrawer()"><svg class="icon"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> Mis Notas</div>
-        <div class="drawer-item" onclick="navigate('configuracion'); toggleDrawer()"><svg class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Configuración</div>
+        <div class="drawer-item" onclick="navigate('configuracion'); toggleDrawer()"><svg class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Personalización</div>
         <div class="drawer-item" onclick="navigate('publicar'); toggleDrawer()"><svg class="icon"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Publicar</div>
         <div class="drawer-item" onclick="navigate('donacion'); toggleDrawer()"><svg class="icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Donación</div>
-        <div class="drawer-item" onclick="navigate('ayuda'); toggleDrawer()"><svg class="icon"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda</div>
+        <div class="drawer-item" onclick="navigate('pedir'); toggleDrawer()"><svg class="icon"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> Pedir Libro</div>
+        <div class="drawer-item" onclick="navigate('ayuda'); toggleDrawer()"><svg class="icon"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda y Reportes</div>
     </div>
 </div>
 
 <header class="app-header">
     <div class="header-top">
-        <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer;">☰</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer;">☰</div>
+            <button class="header-note-btn" onclick="document.getElementById('notes-modal').style.display='flex'">✎</button>
+        </div>
         <div class="search-box">
             <span style="color:#777">🔍</span> 
             <input type="text" id="searchInput" placeholder="Buscar libro..." onkeyup="searchBooks(this.value)">
         </div>
-        <button class="mini-btn" onclick="navigate('mis-notas')">📒 Notas</button>
     </div>
     <nav class="nav-tabs">
         <button id="tab-recientes" class="active" onclick="navigate('recientes')">Inicio</button>
         <button id="tab-nube" onclick="navigate('nube')">Nube</button>
         <button id="tab-versiculo" onclick="navigate('versiculo')">Versículo</button>
         <button id="tab-videos" onclick="navigate('videos')">Videos</button>
-        <button id="tab-debate" onclick="navigate('debate')">Comunidad</button>
+        <button id="tab-debate" onclick="navigate('debate')">Debate</button>
     </nav>
 </header>
 
 <main id="main-content">
 
     <div id="recientes" class="page-section active">
+        <div style="padding: 10px 10px 0 10px;">
+            <button class="intro-note-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
+                📝 Ver Mis Notas Personales
+            </button>
+        </div>
         <div class="shelf-grid" id="grid-recientes"></div>
     </div>
 
     <div id="nube" class="page-section">
         <div class="shelf-grid" id="grid-nube"></div>
     </div>
-    
-    <div id="mis-notas" class="page-section">
-        <h2 style="text-align:center; color:var(--accent);">Mis Apuntes</h2>
-        <div id="saved-notes-list" style="padding:15px;"></div>
-    </div>
-
-    <div id="debate" class="page-section">
-        <div id="chat-login-view" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; min-height:50vh;">
-            <div style="font-size:60px; margin-bottom:20px">👥</div>
-            <h2 style="color:var(--accent)">Comunidad Cristiana</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">Comparte testimonios y peticiones.</p>
-            <button class="btn-google" onclick="loginWithGoogle()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-                Entrar con Google
-            </button>
-        </div>
-
-        <div id="social-feed-view" style="display:none; padding:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <span id="user-name" style="color:var(--accent); font-weight:bold; font-size:12px">Usuario</span>
-                <button onclick="logout()" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; font-size:10px; cursor:pointer;">Cerrar Sesión</button>
-            </div>
-            
-            <div class="glass-panel" style="margin:0 0 20px 0; padding:15px;">
-                <input type="text" id="post-title" class="input-box" placeholder="Título" style="margin-bottom:10px; padding:10px;">
-                <textarea id="post-content" class="input-box" rows="3" placeholder="Comparte algo..." style="margin-bottom:10px; padding:10px;"></textarea>
-                <button class="btn-neon" onclick="createPost()">PUBLICAR</button>
-            </div>
-            <div id="feed-container" class="social-feed-container"></div>
-        </div>
-    </div>
 
     <div id="versiculo" class="page-section">
         <div id="versiculo-container">
             <div id="admin-verse-form" style="display:none; width:100%; margin-bottom:20px; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px;">
                 <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Versículo Diario</h4>
-                <input type="text" id="verseTitle" class="input-box" placeholder="Título" style="margin-bottom:5px">
-                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto..." style="margin-bottom:5px"></textarea>
-                <input type="url" id="verseImgUrl" class="input-box" placeholder="URL Imagen" style="margin-bottom:5px">
+                <input type="text" id="verseTitle" class="input-box" placeholder="Título (ej: La Paz)" style="margin-bottom:5px">
+                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto o descripción del versículo..." style="margin-bottom:5px"></textarea>
+                <input type="url" id="verseImgUrl" class="input-box" placeholder="URL de la imagen" style="margin-bottom:5px">
                 <button class="btn-neon" onclick="updateDailyVerse()">PUBLICAR</button>
-                <button class="btn-neon" onclick="deleteDailyVerse()" style="margin-top:10px; background:red; border-color:red; color:white;">BORRAR</button>
+                <button class="btn-neon" onclick="deleteDailyVerse()" style="margin-top:10px; background:red; border-color:red; color:white;">ELIMINAR VERSÍCULO</button>
             </div>
+
             <div class="verse-card-display">
                 <img id="displayVerseImg" class="verse-img" src="" style="display:none">
                 <h2 id="displayVerseTitle" style="color:var(--accent); margin-top:0;"></h2>
@@ -440,98 +507,220 @@
         </div>
     </div>
 
+    <div id="debate" class="page-section">
+        <div style="max-width: 600px; margin: 0 auto; padding: 10px;">
+            
+            <div id="feed-login-prompt" style="text-align:center; padding:30px; background:var(--ui-bg); border-radius:12px; margin-bottom:20px; border:1px solid var(--ui-border);">
+                <div style="font-size:50px; margin-bottom:10px">👥</div>
+                <h3 style="color:var(--accent); margin-top:0">Únete a la Comunidad</h3>
+                <p style="color:var(--text-muted); font-size:13px;">Inicia sesión para publicar temas, dar likes y comentar.</p>
+                <button class="btn-google" onclick="loginWithGoogle()" style="margin:20px auto; width:80%;">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                    Iniciar Sesión con Google
+                </button>
+            </div>
+
+            <div id="create-post-container" class="create-post-card" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="user-avatar-display" class="post-avatar">?</span>
+                        <span id="user-name-display" style="font-weight:bold; color:var(--text-main); font-size:14px;">Usuario</span>
+                    </div>
+                    <button onclick="logout()" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; font-size:11px; cursor:pointer;">Cerrar sesión</button>
+                </div>
+                
+                <input type="text" id="postTitle" class="input-box" placeholder="Título de tu tema..." style="margin-bottom:8px; padding:10px;">
+                <textarea id="postBody" class="input-box" rows="3" placeholder="Comparte una reflexión o pregunta..." style="margin-bottom:10px; padding:10px;"></textarea>
+                <button class="btn-neon" onclick="createPost()">PUBLICAR</button>
+            </div>
+
+            <div id="feed-container" class="social-feed">
+                <p style="text-align:center; color:#666; padding:20px;">Cargando...</p>
+            </div>
+        </div>
+    </div>
+
     <div id="videos" class="page-section">
         <div id="admin-video-form" style="display:none; margin:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px; z-index:20; position:relative;">
-            <input type="text" id="vidTitle" class="input-box" placeholder="Título">
-            <input type="text" id="vidDesc" class="input-box" placeholder="Descripción">
-            <input type="url" id="vidUrl" class="input-box" placeholder="Link YouTube">
+            <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Subir Video</h4>
+            <input type="text" id="vidTitle" class="input-box" placeholder="Título del Video">
+            <input type="text" id="vidDesc" class="input-box" placeholder="Descripción breve">
+            <input type="url" id="vidUrl" class="input-box" placeholder="Link de YouTube">
             <button class="btn-neon" onclick="uploadVideo()">AGREGAR VIDEO</button>
         </div>
         <div id="video-list" style="padding:15px; padding-bottom:80px; z-index:10; position:relative;"></div>
     </div>
 
     <div id="favoritos" class="page-section">
-        <h2 style="text-align:center;color:var(--text-main);">Mis Favoritos ❤️</h2>
+        <h2 style="text-align:center;color:var(--text-main);text-shadow:0 0 10px var(--accent);">Mis Favoritos ❤️</h2>
         <div class="shelf-grid" id="grid-favoritos"></div>
     </div>
 
     <div id="configuracion" class="page-section">
         <div class="glass-panel">
-            <h2 style="margin-top:0; color:var(--accent); text-align:center">Temas</h2>
+            <h2 style="margin-top:0; color:var(--accent); text-align:center"> Atmósfera de Lectura</h2>
             <div class="theme-grid">
-                <div class="theme-card active" onclick="changeTheme('default', this)"><div class="theme-preview-circle" style="background:#1e1e24; border-color:#555"></div><div class="theme-name">Dark</div></div>
-                <div class="theme-card" onclick="changeTheme('orange', this)"><div class="theme-preview-circle" style="background:#1a1008; border-color:#ff6d00"></div><div class="theme-name">Orange</div></div>
-                <div class="theme-card" onclick="changeTheme('silver', this)"><div class="theme-preview-circle" style="background:#212121; border-color:#b0bec5"></div><div class="theme-name">Silver</div></div>
-                <div class="theme-card" onclick="changeTheme('red', this)"><div class="theme-preview-circle" style="background:#1a0505; border-color:#ff1744"></div><div class="theme-name">Red</div></div>
-                <div class="theme-card" onclick="changeTheme('blue', this)"><div class="theme-preview-circle" style="background:#050a1a; border-color:#2979ff"></div><div class="theme-name">Blue</div></div>
-                <div class="theme-card" onclick="changeTheme('green', this)"><div class="theme-preview-circle" style="background:#051a0a; border-color:#00e676;"></div><div class="theme-name">Green</div></div>
-                <div class="theme-card" onclick="changeTheme('purple', this)"><div class="theme-preview-circle" style="background:#12051a; border-color:#d500f9;"></div><div class="theme-name">Purple</div></div>
-                <div class="theme-card" onclick="changeTheme('gold', this)"><div class="theme-preview-circle" style="background:#141005; border-color:#ffca28;"></div><div class="theme-name">Gold</div></div>
+                <div class="theme-card active" onclick="changeTheme('default', this)"><div class="theme-preview-circle" style="background:#1e1e24; border-color:#555"></div><div class="theme-name">Dark Slate</div></div>
+                <div class="theme-card" onclick="changeTheme('orange', this)"><div class="theme-preview-circle" style="background:#1a1008; border-color:#ff6d00"></div><div class="theme-name">Energetic Orange</div></div>
+                <div class="theme-card" onclick="changeTheme('silver', this)"><div class="theme-preview-circle" style="background:#212121; border-color:#b0bec5"></div><div class="theme-name">Sleek Silver</div></div>
+                <div class="theme-card" onclick="changeTheme('red', this)"><div class="theme-preview-circle" style="background:#1a0505; border-color:#ff1744"></div><div class="theme-name">Crimson Red</div></div>
+                <div class="theme-card" onclick="changeTheme('blue', this)"><div class="theme-preview-circle" style="background:#050a1a; border-color:#2979ff"></div><div class="theme-name">Royal Blue</div></div>
+                <div class="theme-card" onclick="changeTheme('green', this)"><div class="theme-preview-circle" style="background:#051a0a; border-color:#00e676;"></div><div class="theme-name">Emerald Green</div></div>
+                <div class="theme-card" onclick="changeTheme('purple', this)"><div class="theme-preview-circle" style="background:#12051a; border-color:#d500f9;"></div><div class="theme-name">Deep Purple</div></div>
+                <div class="theme-card" onclick="changeTheme('gold', this)"><div class="theme-preview-circle" style="background:#141005; border-color:#ffca28;"></div><div class="theme-name">Luxury Gold</div></div>
             </div>
             
             <div style="text-align:center; margin-top:20px;">
                 <button onclick="toggleAdminMode()" style="background:none; border:1px solid #444; padding:5px 15px; border-radius:15px; color:var(--text-muted); font-size:10px; cursor:pointer;">Admin Mode</button>
             </div>
+
             <div id="admin-update-form" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
-                <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">Configurar Alerta</h3>
-                <select id="updStatus" class="input-box" style="padding:10px; height:auto; margin-bottom:10px; background:#111;"><option value="off">🔴 Off</option><option value="on">🟢 On</option></select>
-                <input type="text" id="updTitleInput" class="input-box" placeholder="Título">
-                <textarea id="updMsgInput" class="input-box" rows="2" placeholder="Mensaje"></textarea>
-                <input type="text" id="updLinkInput" class="input-box" placeholder="Link">
-                <button class="btn-neon" onclick="saveUpdateConfig()">GUARDAR</button>
+                <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">🔔 Configurar Alerta</h3>
+                <label style="font-size:10px; color:var(--accent);">ESTADO DEL AVISO</label>
+                <select id="updStatus" class="input-box" style="padding:10px; height:auto; margin-bottom:10px; background:#111;">
+                    <option value="off">🔴 Desactivado</option>
+                    <option value="on">🟢 Activado (Visible al entrar)</option>
+                </select>
+                <label style="font-size:10px; color:var(--accent);">TÍTULO DE LA VENTANA</label>
+                <input type="text" id="updTitleInput" class="input-box" placeholder="Ej: ¡Nueva Versión Disponible!">
+                <label style="font-size:10px; color:var(--accent);">MENSAJE / TEXTO</label>
+                <textarea id="updMsgInput" class="input-box" rows="2" placeholder="Ej: Descarga la nueva..."></textarea>
+                <label style="font-size:10px; color:var(--accent);">LINK DE DESCARGA</label>
+                <input type="text" id="updLinkInput" class="input-box" placeholder="https://...">
+                <button class="btn-neon" onclick="saveUpdateConfig()">GUARDAR CONFIGURACIÓN</button>
             </div>
         </div>
     </div>
 
     <div id="publicar" class="page-section">
         <div class="glass-panel">
-            <h2 style="color:var(--accent);margin-top:0;">Subir a la Nube</h2>
-            <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'Libro disponible.')">
-                <input type="text" id="pubTitle" class="input-box" required placeholder="Título">
-                <input type="text" id="pubAuthor" class="input-box" required placeholder="Autor">
-                <input type="url" id="pubLink" class="input-box" required placeholder="Link PDF">
-                <input type="url" id="pubCover" class="input-box" placeholder="Portada URL">
-                <button type="button" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR</button>
+            <h2 style="color:var(--accent);margin-top:0;"> Subir a la Nube</h2>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px">Agrega un libro a la base de datos pública.</p>
+            <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'El libro está disponible para todos.')">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">TÍTULO</label>
+                <input type="text" id="pubTitle" class="input-box" required placeholder="Título del libro">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">AUTOR</label>
+                <input type="text" id="pubAuthor" class="input-box" required placeholder="Nombre del Autor">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PDF (Google Drive/Dropbox)</label>
+                <input type="url" id="pubLink" class="input-box" required placeholder="https://...">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PORTADA (Opcional)</label>
+                <input type="url" id="pubCover" class="input-box" placeholder="https://... (Si está vacío, se genera sola)">
+                <button type="button" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR AHORA</button>
             </form>
         </div>
     </div>
 
     <div id="donacion" class="page-section">
         <div class="glass-panel" style="text-align:center">
-            <h2 style="color:#ffcc00;">Donaciones</h2>
-            <p style="font-size:14px; color:var(--text-muted)">Tu apoyo mantiene los servidores activos.</p>
-            <div style="font-size:50px; margin:20px 0;">🤝</div>
-            <button class="btn-neon" style="color:#ffcc00; border-color:#ffcc00" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=5YA3A93HWYMRA','_blank')">Donar con PayPal</button>
+            <h2 style="color:#ffcc00; text-shadow:0 0 15px rgba(255,215,0,0.6)">Donaciones</h2>
+            <p style="font-size:14px; color:var(--text-muted)">Tu apoyo mantiene los servidores activos y la verdad al alcance de todos.</p>
+            <div style="font-size:50px; margin:20px 0; animation: float 3s ease-in-out infinite;">🤝</div>
+            <button class="btn-neon" style="background:rgba(255,204,0,0.1); border-color:#ffcc00; color:#ffcc00" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=5YA3A93HWYMRA','_blank')">❤️ Donar con PayPal</button>
         </div>
     </div>
 
     <div id="pedir" class="page-section">
         <div class="glass-panel">
-            <h2 style="color:var(--accent)">Pedir Libro</h2>
-            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Enviado', 'Gracias por tu pedido.')">
-                <input type="hidden" name="_subject" value="Pedido">
-                <input type="text" name="libro" class="input-box" placeholder="Libro" required>
-                <input type="text" name="autor" class="input-box" placeholder="Autor">
-                <button type="submit" class="btn-neon">ENVIAR</button>
+            <h2 style="color:var(--accent)">Solicitar Libro</h2>
+            <p style="font-size:12px; color:var(--text-muted)">Haremos lo posible por conseguirlo.</p>
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Solicitud Enviada', '¡Gracias! Buscaremos el libro.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="Pedido de Libro">
+                <input type="text" name="libro" class="input-box" placeholder="Nombre del Libro" required>
+                <input type="text" name="autor" class="input-box" placeholder="Autor (Opcional)">
+                <button type="submit" class="btn-neon">ENVIAR PEDIDO</button>
             </form>
         </div>
     </div>
 
     <div id="ayuda" class="page-section">
         <div class="glass-panel">
-            <h2 style="color:var(--accent); text-align:center">Ayuda y Reportes</h2>
-            <p style="font-size:11px; text-align:center; color:#aaa">Si encuentras errores o contenido con derechos.</p>
-            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos el caso.')">
-                <input type="hidden" name="_subject" value="REPORTE">
-                <input type="text" name="nombre" class="input-box" placeholder="Tu Nombre" required>
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); letter-spacing:1px; font-size:18px; text-align:center; width:100%">PREGUNTAS FRECUENTES</h2>
+            
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Esta biblioteca es totalmente gratuita?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí, el acceso a la lectura y descarga de materiales en PDF y ePub es gratuito. Nuestro propósito es facilitar el acceso a la literatura cristiana para edificación de todos. Sin embargo, creemos firmemente que "el obrero es digno de su salario" (1 Timoteo 5:18). Por ello, recomendamos encarecidamente que, si tienes la solvencia económica, compres el libro directamente a su autor o en su tienda oficial para bendecir su ministerio.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Por qué hay publicidad en la aplicación y el sitio web?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    La publicidad nos permite mantener la plataforma en línea, cubrir los costos de servidores, almacenamiento y mantenimiento técnico para que el servicio siga estando disponible para todos, especialmente para aquellos que no tienen recursos para adquirir libros.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ Si hago una donación, ¿se elimina la publicidad?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    No. Hemos decidido mantener la publicidad general para sostener la infraestructura técnica básica. Las donaciones tienen un propósito diferente y más noble: se utilizan para apoyar económicamente a los autores independientes dentro de nuestra plataforma y para adquirir legalmente nuevos libros y licencias para ampliar la biblioteca comunitaria.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿A dónde va el dinero de los ingresos y donaciones?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Operamos bajo un modelo de transparencia y mayordomía. Los fondos se distribuyen de la siguiente manera:<br>
+                    • Mantenimiento técnico de la web y la app.<br>
+                    • Un porcentaje se destina como beneficio directo a los autores asociados.<br>
+                    • Compra de nuevo material bibliográfico para ponerlo a disposición de los usuarios.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Puedo importar mis propios archivos a la aplicación?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí. Nuestra app cuenta con una función de "Importar Archivos" que te permite cargar tus propios PDF y ePubs para que puedas usar nuestra plataforma como tu lector personal y tener toda tu biblioteca organizada en un solo lugar.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Qué hago si encuentro un libro que infringe derechos de autor?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Respetamos profundamente la propiedad intelectual y el trabajo de los escritores cristianos. Si eres el autor o representante legal de una obra y deseas que sea retirada o gestionar sus derechos, por favor utiliza nuestro Formulario de Reporte. Atenderemos tu solicitud a la brevedad posible para actuar conforme a la ley y a la ética cristiana.
+                </p>
+            </details>
+
+            <br>
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); font-size:16px;"> REPORTE Y GESTIÓN</h2>
+            <p style="font-size:11px; margin-bottom:20px; color:var(--text-muted); text-align:center">Para errores técnicos, enlaces rotos o gestión de derechos de autor.</p>
+
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos tu caso a la brevedad.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="REPORTE URGENTE - APP BIBLIOTECA">
+                
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">1. DATOS DE CONTACTO</div>
+                <input type="text" name="nombre" class="input-box" placeholder="Nombre Completo" required>
                 <input type="email" name="email" class="input-box" placeholder="Email" required>
-                <input type="text" name="recurso" class="input-box" placeholder="Libro / URL" required>
-                <textarea name="mensaje" class="input-box" rows="3" placeholder="Detalle del problema..."></textarea>
-                <button type="submit" class="btn-neon">ENVIAR REPORTE</button>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">2. DETALLES</div>
+                <input type="text" name="recurso" class="input-box" placeholder="Título del Libro / URL" required>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">3. MOTIVO</div>
+                <select name="motivo" class="input-box" style="background:#222; color:white">
+                    <option>Infracción Derechos de Autor</option>
+                    <option>Archivo Dañado</option>
+                    <option>Información Incorrecta</option>
+                    <option>Contenido Inapropiado</option>
+                    <option>Otro</option>
+                </select>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">4. MENSAJE / PRUEBAS</div>
+                <textarea name="mensaje" class="input-box" rows="4" placeholder="Detalles adicionales..."></textarea>
+
+                <label style="display:flex; gap:10px; font-size:11px; color:var(--text-muted); align-items:flex-start; margin-top:10px">
+                    <input type="checkbox" required>
+                    <span>Declaro que la información es verídica. Reportes falsos perjudican a la comunidad.</span>
+                </label>
+
+                <button type="submit" class="btn-neon filled" style="margin-top:20px">ENVIAR REPORTE</button>
             </form>
         </div>
     </div>
+
 </main>
+
 <footer class="bottom-bar">
     <button class="nav-item" onclick="navigate('recientes')">
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio
@@ -546,12 +735,12 @@
         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda
     </button>
 </footer>
-<button class="fab-notes" onclick="openGeneralNote()">✎</button>
 <script type="module">
-    /* --- 1. CONFIGURACIÓN FIREBASE & AUTH (CON REDIRECT) --- */
+    /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc, onSnapshot, query, orderBy, serverTimestamp, where, limit } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    /* IMPORTANTE: Agregamos getDoc para verificar perfiles de usuario */
+    import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, getDoc, doc, onSnapshot, query, orderBy, serverTimestamp, where, limit, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDLyZS-alUh5DOtBBtts-8D_hza-n71Y3I",
@@ -564,25 +753,37 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
+    const auth = getAuth(app); 
 
-    /* RECUPERAR SESIÓN EN MÓVILES TRAS REDIRECT */
-    getRedirectResult(auth).then((result) => {
-        if (result) console.log("Login móvil recuperado");
-    }).catch((error) => console.error(error));
+    /* --- 1.1 MANEJO RETORNO LOGIN (MÓVILES) --- */
+    getRedirectResult(auth)
+        .then((result) => {
+            if (result) {
+                console.log("Regreso de Google exitoso.");
+                // La lógica de perfil se maneja en onAuthStateChanged (Parte 4)
+            }
+        })
+        .catch((error) => {
+            if (error.code !== 'auth/popup-closed-by-user') {
+                console.error("Error Login:", error);
+            }
+        });
 
     /* --- 2. ESTADO GLOBAL --- */
     let cloudBooks = []; 
     let youtubeVideos = [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
-    let savedNotes = JSON.parse(localStorage.getItem('my_saved_notes_v2')) || [];
     let updateConfig = { status: 'off', title: '', msg: '', link: '' }; 
     let isAdminMode = localStorage.getItem('is_admin_active') === 'true'; 
     let hasShownUpdate = false; 
     let leavesInterval, rainInterval; 
-    let currentUser = null; 
+    
+    // VARIABLES DE USUARIO
+    window.currentUser = null;       // Objeto de Auth de Google
+    window.currentUserProfile = null; // Objeto de Firestore (Nick + Avatar)
 
-    /* --- 3. CONEXIÓN A BASE DE DATOS --- */
+    /* --- 3. LISTENERS BASE DE DATOS (CONTENIDO) --- */
+    
     // Libros
     onSnapshot(query(collection(db, "libros"), orderBy("timestamp", "desc")), (snapshot) => {
         cloudBooks = [];
@@ -602,7 +803,7 @@
         renderVerse(docSnap.exists() ? docSnap.data() : null);
     });
 
-    // Alerta Update
+    // Configuración Alerta
     onSnapshot(doc(db, "configuracion", "alerta_update"), (docSnap) => {
         if (docSnap.exists()) {
             updateConfig = docSnap.data();
@@ -614,7 +815,12 @@
                 document.getElementById('update-modal').style.display = 'flex';
                 hasShownUpdate = true;
             }
-            if (isAdminMode) populateAdminUpdateForm();
+            if (isAdminMode) {
+                document.getElementById('updStatus').value = updateConfig.status;
+                document.getElementById('updTitleInput').value = updateConfig.title;
+                document.getElementById('updMsgInput').value = updateConfig.msg;
+                document.getElementById('updLinkInput').value = updateConfig.link;
+            }
         }
     });
 
@@ -623,11 +829,10 @@
         if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
         if(document.getElementById('videos').classList.contains('active')) renderVideoList();
         if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
-        if(document.getElementById('mis-notas').classList.contains('active')) renderSavedNotes();
         toggleAdminForms(isAdminMode);
     }
 
-    /* --- 4. FUNCIONES DE ADMIN --- */
+    /* --- 4. ADMIN MODE --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
@@ -642,18 +847,22 @@
             isAdminMode = true;
             localStorage.setItem('is_admin_active', 'true');
             toggleAdminForms(true);
-            alert("✅ Modo Admin: ACTIVADO");
+            alert("✅ Modo Admin: ACTIVADO\nAhora verás botones para BORRAR posts.");
             refreshActiveViews();
-            if(updateConfig) populateAdminUpdateForm();
-        } else { alert("⛔ Incorrecta."); }
+            // Refrescar feed si estamos ahí para mostrar botones de borrar
+            if(document.getElementById('debate').classList.contains('active')) initSocialFeed();
+            
+            if(updateConfig) {
+                document.getElementById('updStatus').value = updateConfig.status || 'off';
+                document.getElementById('updTitleInput').value = updateConfig.title || '';
+                document.getElementById('updMsgInput').value = updateConfig.msg || '';
+                document.getElementById('updLinkInput').value = updateConfig.link || '';
+            }
+        } else {
+            alert("⛔ Contraseña incorrecta.");
+        }
     };
 
-    function populateAdminUpdateForm() {
-        document.getElementById('updStatus').value = updateConfig.status || 'off';
-        document.getElementById('updTitleInput').value = updateConfig.title || '';
-        document.getElementById('updMsgInput').value = updateConfig.msg || '';
-        document.getElementById('updLinkInput').value = updateConfig.link || '';
-    }
     function toggleAdminForms(show) {
         const display = show ? 'block' : 'none';
         const vForm = document.getElementById('admin-video-form');
@@ -664,63 +873,99 @@
         if(updForm) updForm.style.display = display;
     }
 
-    /* --- 5. UTILS CRUD --- */
+    /* --- 5. FUNCIONES CRUD GENERALES --- */
     window.saveUpdateConfig = async function() {
-        const data = { status: document.getElementById('updStatus').value, title: document.getElementById('updTitleInput').value, msg: document.getElementById('updMsgInput').value, link: document.getElementById('updLinkInput').value };
+        const data = {
+            status: document.getElementById('updStatus').value,
+            title: document.getElementById('updTitleInput').value,
+            msg: document.getElementById('updMsgInput').value,
+            link: document.getElementById('updLinkInput').value
+        };
         try { await setDoc(doc(db, "configuracion", "alerta_update"), data); showModal("Guardado", "Alerta actualizada."); } catch(e) { alert(e.message); }
     };
-    window.deleteItem = async function(collectionName, id) { if(event) event.stopPropagation(); if(confirm("¿Eliminar?")) try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert(e.message); } };
-    
-    window.openEditModal = function(col, id) {
+
+    window.deleteItem = async function(collectionName, id) {
         if(event) event.stopPropagation();
-        let item = (col === 'libros') ? cloudBooks.find(b => b.id === id) : youtubeVideos.find(v => v.id === id);
-        if(!item) return;
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-collection').value = col;
-        document.getElementById('edit-title-input').value = item.title || "";
-        document.getElementById('edit-desc-input').value = (col==='libros') ? item.author : item.desc || "";
-        document.getElementById('edit-link-input').value = (col==='libros') ? item.pdfLink : item.url || "";
-        document.getElementById('edit-img-input').value = (col==='libros') ? item.cover : "";
-        document.getElementById('edit-modal').style.display = 'flex';
-    };
-    window.saveEdit = async function() {
-        const id = document.getElementById('edit-id').value, col = document.getElementById('edit-collection').value;
-        const d = { title: document.getElementById('edit-title-input').value };
-        if(col === 'libros') { d.author = document.getElementById('edit-desc-input').value; d.pdfLink = document.getElementById('edit-link-input').value; d.cover = document.getElementById('edit-img-input').value; }
-        else { d.desc = document.getElementById('edit-desc-input').value; d.url = document.getElementById('edit-link-input').value; }
-        try { await updateDoc(doc(db, col, id), d); document.getElementById('edit-modal').style.display = 'none'; showModal("Listo", "Guardado."); } catch(e) { alert(e.message); }
+        if(!confirm("⚠️ ¿ELIMINAR DEFINITIVAMENTE?")) return;
+        try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert("Error: " + e.message); }
     };
 
-    /* --- 6. NAVEGACIÓN --- */
-    window.toggleDrawer = function() { const d = document.getElementById('drawer'); d.classList.toggle('open'); document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; };
+    window.openEditModal = function(collectionName, id) {
+        if(event) event.stopPropagation();
+        let item;
+        if (collectionName === 'libros') {
+            item = cloudBooks.find(b => b.id === id);
+            document.getElementById('edit-title-input').value = item.title || "";
+            document.getElementById('edit-desc-input').value = item.author || ""; 
+            document.getElementById('edit-link-input').value = item.pdfLink || "";
+            document.getElementById('edit-img-input').value = item.cover || "";
+        } else {
+            item = youtubeVideos.find(v => v.id === id);
+            document.getElementById('edit-title-input').value = item.title || "";
+            document.getElementById('edit-desc-input').value = item.desc || ""; 
+            document.getElementById('edit-link-input').value = item.url || "";
+            document.getElementById('edit-img-input').value = ""; 
+        }
+        if(item) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-collection').value = collectionName;
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+    };
+
+    window.saveEdit = async function() {
+        const id = document.getElementById('edit-id').value;
+        const colName = document.getElementById('edit-collection').value;
+        const updateData = { title: document.getElementById('edit-title-input').value };
+        if(colName === 'libros') {
+            updateData.author = document.getElementById('edit-desc-input').value;
+            updateData.pdfLink = document.getElementById('edit-link-input').value;
+            updateData.cover = document.getElementById('edit-img-input').value;
+        } else {
+            updateData.desc = document.getElementById('edit-desc-input').value;
+            updateData.url = document.getElementById('edit-link-input').value;
+        }
+        try { await updateDoc(doc(db, colName, id), updateData); document.getElementById('edit-modal').style.display = 'none'; showModal("¡Corregido!", "Cambios guardados."); } catch(e) { alert("Error: " + e.message); }
+    };
+
+    /* --- 6. RENDERIZADO VISUAL --- */
+    window.toggleDrawer = function() { 
+        const d = document.getElementById('drawer');
+        d.classList.toggle('open'); 
+        document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; 
+    };
+
     window.navigate = function(id) {
         document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
+        
         document.getElementById(id).classList.add('active');
+        
         const btnMap = {'recientes':0, 'nube':1, 'versiculo':2, 'videos':3, 'debate':4};
         const tabs = document.querySelectorAll('.nav-tabs button');
         if(btnMap[id] !== undefined) tabs[btnMap[id]].classList.add('active');
+        
         refreshActiveViews();
+        
         if(id === 'videos') startRain(); else stopRain();
         if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
-    };
+    }
+
     window.searchBooks = function(q) {
         const t = q.toLowerCase();
         const fBooks = cloudBooks.filter(b => b.title.toLowerCase().includes(t) || b.author.toLowerCase().includes(t));
-        renderLibrary('grid-recientes', fBooks); renderLibrary('grid-nube', fBooks);
-    };
-    window.changeTheme = function(name, element) { document.body.className = name !== 'default' ? 'theme-'+name : ''; document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active')); if(element) element.classList.add('active'); };
-
-    /* --- 7. RENDERIZADO Y HELPERS (CORRECCIÓN PDF AQUÍ) --- */
-    
-    // HELPER: Convertir URLs de Drive de /view a descarga directa
-    function normalizeDriveUrl(url) {
-        if (url && url.includes('drive.google.com') && url.includes('/view')) {
-            // Reemplaza /file/d/XXX/view con /uc?export=download&id=XXX
-            return url.replace(/\/file\/d\/(.+)\/view.*/, '/uc?export=download&id=$1');
+        renderLibrary('grid-recientes', fBooks);
+        renderLibrary('grid-nube', fBooks);
+        if(document.getElementById('videos').classList.contains('active')) {
+            renderVideoList(youtubeVideos.filter(v => v.title.toLowerCase().includes(t)));
         }
-        return url;
-    }
+    };
+
+    window.changeTheme = function(name, element) { 
+        document.body.className = name !== 'default' ? 'theme-'+name : ''; 
+        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+        if(element) element.classList.add('active');
+    };
 
     function renderLibrary(id, books) {
         const c = document.getElementById(id); c.innerHTML = '';
@@ -732,21 +977,19 @@
                 const div = document.createElement('div'); div.className = 'book-wrapper';
                 
                 let coverHtml = b.cover ? `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null;this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">` : `<div class="book-cover generated" style="background:linear-gradient(135deg,${stringToColor(b.title)},#222)"><span>${b.title}</span></div>`;
+
                 let adminBtns = '';
                 if (isAdminMode && b.type === 'cloud') {
-                    adminBtns = `<div class="admin-controls"><div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div><div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div></div>`;
+                    adminBtns = `<div class="admin-controls">
+                        <div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div>
+                        <div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div>
+                    </div>`;
                 }
                 
+                // CLICK: Pestaña nueva ( window.open )
                 div.innerHTML = `<div class="book-title">${b.title}</div>${adminBtns}<svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${coverHtml}`;
                 div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
-                
-                // === CORRECCIÓN MAESTRA DE PDF ===
-                // 1. Normalizar URL (Drive) -> 2. Encode -> 3. Proxy
-                div.onclick = () => {
-                    const cleanUrl = normalizeDriveUrl(b.pdfLink);
-                    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(cleanUrl);
-                    openPdfViewer(proxyUrl, b.title);
-                };
+                div.onclick = () => window.open(b.pdfLink, '_blank');
                 
                 c.appendChild(div);
             });
@@ -754,21 +997,57 @@
         }
     }
 
-    function getYoutubeId(url) { const match = url.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (match&&match[2].length===11)?match[2]:null; }
-    function renderVideoList(list=youtubeVideos) {
+    function getYoutubeId(url) {
+        if(!url) return null;
+        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+    
+    function renderVideoList(list = youtubeVideos) {
         const c = document.getElementById('video-list'); c.innerHTML = '';
         if(!list.length) { c.innerHTML = '<p style="text-align:center;color:#777">No hay videos</p>'; return; }
         list.forEach(v => {
-            const vid = getYoutubeId(v.url), thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360';
+            const vid = getYoutubeId(v.url);
+            const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
             const card = document.createElement('div'); card.className = 'video-card';
-            let adminBtns = isAdminMode ? `<div style="display:flex; border-top:1px solid #444; margin-top:auto;"><button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px;">✏️</button><button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px;">🗑️</button></div>` : '';
+            let adminBtns = '';
+            if(isAdminMode) {
+                adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
+                    <button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px; cursor:pointer; font-weight:bold;">✏️ EDITAR</button>
+                    <button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px; cursor:pointer; font-weight:bold;">🗑️ BORRAR</button>
+                </div>`;
+            }
             card.innerHTML = `<img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')"><div class="video-info"><div class="video-title">${v.title}</div><div class="video-desc">${v.desc||''}</div></div>${adminBtns}`;
             c.appendChild(card);
         });
     }
 
-    window.updateDailyVerse = async function() { try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Actualizado."); } catch(e){alert(e.message);} };
+    // UTILS
+    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
+    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
+    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
+    
+    window.uploadVideo = async function() {
+        const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value;
+        if(!t || !u) return alert("Faltan datos");
+        try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);}
+    };
+
+    window.uploadBookToCloud = async function() {
+        const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value;
+        const btn = document.querySelector('#publishForm .btn-neon');
+        if(!t || !l) return alert("Faltan datos");
+        btn.innerText = "⏳ ..."; btn.disabled = true;
+        try { await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); showModal("Listo", "Libro subido."); document.getElementById('publishForm').reset(); window.navigate('recientes'); } 
+        catch(e){alert(e.message);} finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; }
+    };
+
+    window.updateDailyVerse = async function() {
+        try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Versículo actualizado."); } catch(e){alert(e.message);}
+    };
     window.deleteDailyVerse = async function() { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "configuracion", "versiculo_diario")); };
+    
     function renderVerse(d) {
         if(!d) { document.getElementById('displayVerseTitle').innerText=""; document.getElementById('displayVerseText').innerText="Esperando..."; document.getElementById('displayVerseImg').style.display='none'; return; }
         document.getElementById('displayVerseTitle').innerText=d.title; document.getElementById('displayVerseText').innerText=`"${d.text}"`; document.getElementById('verseDate').innerText=d.date;
@@ -779,240 +1058,294 @@
     function stopFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); document.querySelectorAll('.leaf').forEach(e=>e.remove()); }
     function startRain() { if(rainInterval) clearInterval(rainInterval); const c=document.getElementById('videos'); rainInterval=setInterval(()=>{if(c.querySelectorAll('.rain').length>40)return; const r=document.createElement('div');r.className='rain';r.style.left=Math.random()*100+"%";r.style.animationDuration=(Math.random()*0.5+0.5)+"s";r.onanimationend=()=>r.remove();c.appendChild(r);},100); }
     function stopRain() { if(rainInterval) clearInterval(rainInterval); document.querySelectorAll('.rain').forEach(e=>e.remove()); }
-    
-    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
-    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
-    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
-    window.uploadVideo = async function() { const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value; if(!t||!u)return alert("Faltan datos"); try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);} };
-    window.uploadBookToCloud = async function() { const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value; if(!t||!l)return alert("Datos"); try { await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); showModal("Listo", "Libro subido."); document.getElementById('publishForm').reset(); window.navigate('recientes'); } catch(e){alert(e.message);} };
-    
+
     function stringToColor(str) { let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash); let c='#'; for(let i=0;i<3;i++) c+=('00'+((hash>>(i*8))&0xFF).toString(16)).substr(-2); return c; }
     function toggleFav(b, el) { const idx=favorites.findIndex(f=>f.title===b.title); if(idx===-1){favorites.push(b);if(el)el.classList.add('active');}else{favorites.splice(idx,1);if(el)el.classList.remove('active');if(document.getElementById('favoritos').classList.contains('active'))renderLibrary('grid-favoritos',favorites);} localStorage.setItem('my_fav_books',JSON.stringify(favorites)); }
     /* ================================================================= */
-    /* === 8. LÓGICA DE NEGOCIO: AUTH, SOCIAL, PDF Y NOTAS === */
+    /* === 8. LÓGICA AVANZADA: AUTH, PERFIL Y MURO SOCIAL === */
     /* ================================================================= */
 
-    /* --- A. AUTENTICACIÓN (REDIRECT PARA MÓVILES) --- */
+    /* --- A. AUTH & GESTIÓN DE PERFIL (ONBOARDING) --- */
     window.loginWithGoogle = async () => {
         try { 
             const provider = new GoogleAuthProvider(); 
-            // IMPORTANTE: Redirect soluciona fallos en navegadores integrados (Instagram/FB/WebViews)
+            provider.setCustomParameters({ prompt: 'select_account' });
             await signInWithRedirect(auth, provider); 
         } catch(e) { 
             alert("Error login: " + e.message); 
         }
     };
 
-    window.logout = () => signOut(auth);
+    window.logout = () => {
+        signOut(auth);
+        window.location.reload(); // Recargar para limpiar estados
+    };
 
-    onAuthStateChanged(auth, (user) => {
-        currentUser = user;
-        const loginView = document.getElementById('chat-login-view');
-        const feedView = document.getElementById('social-feed-view');
+    // MONITOR DE ESTADO
+    onAuthStateChanged(auth, async (user) => {
+        window.currentUser = user; 
+        
+        const loginPrompt = document.getElementById('feed-login-prompt');
+        const createPostCard = document.getElementById('create-post-container');
         
         if (user) {
-            if(loginView) loginView.style.display = 'none';
-            if(feedView) feedView.style.display = 'block';
-            document.getElementById('user-name').innerText = user.displayName || "Anónimo";
-            initFeedListener();
+            // 1. USUARIO AUTENTICADO -> VERIFICAR PERFIL EN DB
+            const userRef = doc(db, "usuarios", user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                // A. YA TIENE PERFIL: Cargar datos y mostrar UI
+                window.currentUserProfile = userSnap.data();
+                updateUserUI();
+            } else {
+                // B. NUEVO USUARIO: Mostrar Modal de Configuración
+                document.getElementById('profile-nick').value = user.displayName; // Precargar nombre Google
+                document.getElementById('profile-setup-modal').style.display = 'flex';
+            }
+
+            if(loginPrompt) loginPrompt.style.display = 'none';
         } else {
-            if(loginView) loginView.style.display = 'flex';
-            if(feedView) feedView.style.display = 'none';
+            // USUARIO ANÓNIMO
+            if(loginPrompt) loginPrompt.style.display = 'block';
+            if(createPostCard) createPostCard.style.display = 'none';
         }
+        
+        // Cargar el feed (visible para todos)
+        initSocialFeed();
     });
 
-    /* --- B. MURO SOCIAL (FEED + COMENTARIOS) --- */
-    let unsubscribeFeed = null;
-    const feedContainer = document.getElementById('feed-container');
+    // A.1 FUNCIONES DEL MODAL DE PERFIL
+    window.selectAvatar = (emoji, el) => {
+        document.querySelectorAll('.avatar-option').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('selected-avatar-val').value = emoji;
+    };
 
-    function initFeedListener() {
+    window.saveUserProfile = async () => {
+        const nick = document.getElementById('profile-nick').value.trim();
+        const avatar = document.getElementById('selected-avatar-val').value;
+
+        if(!nick || !avatar) return alert("Por favor elige un Nickname y un Avatar.");
+
+        const userData = {
+            uid: window.currentUser.uid,
+            nickname: nick,
+            avatar: avatar,
+            email: window.currentUser.email, // Opcional, para admin
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            await setDoc(doc(db, "usuarios", window.currentUser.uid), userData);
+            window.currentUserProfile = userData; // Guardar en memoria
+            document.getElementById('profile-setup-modal').style.display = 'none';
+            updateUserUI();
+            showModal("¡Bienvenido!", "Perfil creado con éxito.");
+        } catch(e) {
+            alert("Error al guardar perfil: " + e.message);
+        }
+    };
+
+    function updateUserUI() {
+        // Actualizar la tarjeta de "Crear Publicación"
+        const card = document.getElementById('create-post-container');
+        if(card && window.currentUserProfile) {
+            card.style.display = 'block';
+            document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
+            document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
+        }
+    }
+
+    /* --- B. MURO SOCIAL (FEED) --- */
+    let unsubscribeFeed = null;
+
+    function initSocialFeed() {
         if(unsubscribeFeed) unsubscribeFeed();
 
-        // Escuchar publicaciones
-        const q = query(collection(db, "publicaciones"), orderBy("timestamp", "desc"), limit(20));
+        const container = document.getElementById('feed-container');
+        if(!container) return;
+
+        const q = query(collection(db, "publicaciones"), orderBy("timestamp", "desc"), limit(50));
         
         unsubscribeFeed = onSnapshot(q, (snapshot) => {
-            feedContainer.innerHTML = '';
+            container.innerHTML = ''; 
             if (snapshot.empty) {
-                feedContainer.innerHTML = '<div style="text-align:center;color:#777;padding:20px">Sé el primero en publicar algo hoy.</div>';
+                container.innerHTML = `<p style="text-align:center; color:#777; margin-top:20px">No hay publicaciones aún.</p>`;
                 return;
             }
 
             snapshot.forEach(docSnap => {
                 const post = docSnap.data();
                 const pid = docSnap.id;
-                const date = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : 'Reciente';
-                const iLiked = post.likes && post.likes.includes(currentUser.uid);
                 
-                const div = document.createElement('div');
-                div.className = 'post-card';
-                div.innerHTML = `
+                const likes = post.likes || [];
+                const disagrees = post.disagrees || [];
+                const userLiked = window.currentUser && likes.includes(window.currentUser.uid);
+                const userDisagreed = window.currentUser && disagrees.includes(window.currentUser.uid);
+
+                // BOTÓN BORRAR (ADMIN)
+                let deleteBtn = isAdminMode ? `<button class="post-del-btn" onclick="deletePost('${pid}')">🗑️</button>` : '';
+
+                const card = document.createElement('div');
+                card.className = 'social-card';
+                card.innerHTML = `
                     <div class="post-header">
-                        <div class="user-avatar">${post.authorName.charAt(0)}</div>
-                        <div class="post-info"><h4>${post.authorName}</h4><span>${date}</span></div>
+                        <div class="post-avatar">${post.authorAvatar || '?'}</div>
+                        <div class="post-meta">
+                            <span class="post-author">${post.authorName || 'Anónimo'}</span>
+                            <span class="post-date">${post.dateStr || ''}</span>
+                        </div>
+                        ${deleteBtn}
                     </div>
-                    <div class="post-content">
-                        ${post.title ? `<h3>${post.title}</h3>` : ''}
-                        <p>${post.content}</p>
-                    </div>
-                    <div class="post-actions">
-                        <button class="action-btn ${iLiked ? 'active-like' : ''}" onclick="toggleLike('${pid}', ${iLiked})">
-                            ❤ ${post.likes ? post.likes.length : 0}
+                    <div class="post-title">${post.title || ''}</div>
+                    <div class="post-body">${post.text || ''}</div>
+                    
+                    <div class="social-actions">
+                        <button class="action-btn ${userLiked ? 'liked' : ''}" onclick="interactPost('${pid}', 'like')">
+                            👍 ${likes.length || 0}
+                        </button>
+                        <button class="action-btn ${userDisagreed ? 'disagreed' : ''}" onclick="interactPost('${pid}', 'disagree')">
+                            👎 ${disagrees.length || 0}
                         </button>
                         <button class="action-btn" onclick="toggleComments('${pid}')">
                             💬 Comentar
                         </button>
                     </div>
+
                     <div id="comments-${pid}" class="comments-section">
-                        <div id="list-${pid}" style="margin-bottom:10px"></div>
-                        <div style="display:flex; gap:5px">
-                            <input type="text" id="input-${pid}" class="input-box" style="margin:0; padding:8px; height:auto" placeholder="Comentario...">
-                            <button class="mini-btn" onclick="addComment('${pid}')">Enviar</button>
-                        </div>
+                        <div id="comments-list-${pid}"></div>
+                        ${window.currentUser ? `
+                            <form onsubmit="postComment(event, '${pid}')" style="display:flex; gap:5px; margin-top:10px;">
+                                <input type="text" id="input-comment-${pid}" class="input-box" placeholder="Escribe un comentario..." style="margin:0; padding:8px; font-size:12px;">
+                                <button type="submit" style="background:var(--accent); border:none; border-radius:4px; color:#000; font-weight:bold; cursor:pointer;">➤</button>
+                            </form>
+                        ` : `<p style="font-size:10px; color:#777; margin-top:5px">Regístrate para comentar.</p>`}
                     </div>
                 `;
-                feedContainer.appendChild(div);
-                loadComments(pid); // Cargar subcolección
+                container.appendChild(card);
             });
         });
     }
 
+    /* --- C. ACCIONES DEL MURO --- */
     window.createPost = async () => {
-        const title = document.getElementById('post-title').value.trim();
-        const content = document.getElementById('post-content').value.trim();
-        if(!content) return alert("Escribe algo.");
+        if(!window.currentUserProfile) return alert("Error de perfil. Recarga la página.");
+        
+        const title = document.getElementById('postTitle').value.trim();
+        const text = document.getElementById('postBody').value.trim();
+
+        if(!title || !text) return alert("Escribe algo para publicar.");
+
         try {
-            await addDoc(collection(db, "publicaciones"), { uid: currentUser.uid, authorName: currentUser.displayName, title: title, content: content, timestamp: serverTimestamp(), likes: [] });
-            document.getElementById('post-title').value = ''; document.getElementById('post-content').value = '';
-        } catch(e) { alert("Error: " + e.message); }
+            await addDoc(collection(db, "publicaciones"), {
+                title: title,
+                text: text,
+                // USAMOS DATOS DEL PERFIL PERSONALIZADO
+                authorName: window.currentUserProfile.nickname,
+                authorAvatar: window.currentUserProfile.avatar,
+                authorUid: window.currentUser.uid,
+                timestamp: serverTimestamp(),
+                dateStr: new Date().toLocaleDateString(),
+                likes: [],
+                disagrees: []
+            });
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postBody').value = '';
+            showModal("Publicado", "Tu tema está en el muro.");
+        } catch(e) {
+            console.error(e);
+            alert("Error al publicar: " + e.message);
+        }
     };
 
-    window.toggleLike = async (pid, currentlyLiked) => {
-        const postRef = doc(db, "publicaciones", pid);
+    window.interactPost = async (pid, type) => {
+        if(!window.currentUser) return alert("Inicia sesión para votar.");
+        const uid = window.currentUser.uid;
+        const ref = doc(db, "publicaciones", pid);
+        
         try {
-            // Lectura y actualización simple (Optimista)
-            const docSnap = await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js").then(mod => mod.getDoc(postRef));
-            if(docSnap.exists()){
-                let likes = docSnap.data().likes || [];
-                if(currentlyLiked) likes = likes.filter(uid => uid !== currentUser.uid);
-                else likes.push(currentUser.uid);
-                await updateDoc(postRef, { likes: likes });
+            if(type === 'like') {
+                await updateDoc(ref, { likes: arrayUnion(uid), disagrees: arrayRemove(uid) });
+            } else {
+                await updateDoc(ref, { disagrees: arrayUnion(uid), likes: arrayRemove(uid) });
             }
         } catch(e) { console.error(e); }
     };
 
-    window.toggleComments = (pid) => { const s = document.getElementById(`comments-${pid}`); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
+    window.deletePost = async (pid) => {
+        if(!confirm("ADMIN: ¿Borrar esta publicación?")) return;
+        try { await deleteDoc(doc(db, "publicaciones", pid)); } catch(e) { alert(e.message); }
+    };
 
-    window.addComment = async (pid) => {
-        const input = document.getElementById(`input-${pid}`);
-        const text = input.value.trim();
-        if(!text) return;
-        try { await addDoc(collection(db, "publicaciones", pid, "comentarios"), { uid: currentUser.uid, authorName: currentUser.displayName, text: text, timestamp: serverTimestamp() }); input.value = ''; } catch(e) { console.error(e); }
+    /* --- D. COMENTARIOS --- */
+    window.toggleComments = (pid) => {
+        const sec = document.getElementById(`comments-${pid}`);
+        if(sec.style.display === 'none' || sec.style.display === '') {
+            sec.style.display = 'block';
+            loadComments(pid);
+        } else {
+            sec.style.display = 'none';
+        }
     };
 
     function loadComments(pid) {
-        const listDiv = document.getElementById(`list-${pid}`);
-        const q = query(collection(db, "publicaciones", pid, "comentarios"), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snap) => {
+        const listDiv = document.getElementById(`comments-list-${pid}`);
+        onSnapshot(query(collection(db, "publicaciones", pid, "comentarios"), orderBy("timestamp", "asc")), (snap) => {
             listDiv.innerHTML = '';
-            snap.forEach(doc => {
-                const c = doc.data();
-                const div = document.createElement('div'); div.className = 'comment-item';
-                div.innerHTML = `<div class="comment-author">${c.authorName}</div>${c.text}`;
-                listDiv.appendChild(div);
+            snap.forEach(d => {
+                const c = d.data();
+                const delBtn = isAdminMode ? `<span onclick="deleteComment('${pid}', '${d.id}')" style="color:red; cursor:pointer; font-size:10px; margin-left:5px;">[x]</span>` : '';
+                
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">${c.authorAvatar || ''} ${c.authorName} ${delBtn}</span>
+                        <span style="color:#555; font-size:9px">${c.dateStr}</span>
+                    </div>
+                    <div class="comment-text">${c.text}</div>
+                `;
+                listDiv.appendChild(item);
             });
         });
     }
 
-    /* --- C. MOTOR PDF.JS --- */
-    let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null, scale = 1.2;
-    const canvas = document.getElementById('the-canvas');
-    const ctx = canvas.getContext('2d');
-    let currentNoteContext = "Nota General"; 
+    window.postComment = async (e, pid) => {
+        e.preventDefault();
+        const input = document.getElementById(`input-comment-${pid}`);
+        const text = input.value.trim();
+        if(!text || !window.currentUserProfile) return;
 
-    window.openPdfViewer = (url, title) => {
-        document.getElementById('pdf-viewer-modal').style.display = 'flex';
-        document.getElementById('pdf-title').innerText = title || "Documento";
-        currentNoteContext = "Libro: " + (title || "Desconocido");
-        
-        pdfjsLib.getDocument(url).promise.then((pdf) => {
-            pdfDoc = pdf;
-            document.getElementById('page-count').textContent = pdf.numPages;
-            pageNum = 1;
-            renderPage(pageNum);
-        }).catch(err => {
-            console.error("Error PDF:", err);
-            alert("No se pudo cargar el PDF. Verifica que el link sea público.");
-            closePdfViewer();
-        });
-    };
-
-    function renderPage(num) {
-        pageRendering = true;
-        pdfDoc.getPage(num).then((page) => {
-            let viewport = page.getViewport({scale: scale});
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            const renderContext = { canvasContext: ctx, viewport: viewport };
-            page.render(renderContext).promise.then(() => {
-                pageRendering = false;
-                if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; }
+        try {
+            await addDoc(collection(db, "publicaciones", pid, "comentarios"), {
+                text: text,
+                authorName: window.currentUserProfile.nickname,
+                authorAvatar: window.currentUserProfile.avatar,
+                authorUid: window.currentUser.uid,
+                timestamp: serverTimestamp(),
+                dateStr: new Date().toLocaleDateString()
             });
-        });
-        document.getElementById('page-num').textContent = num;
-    }
-    window.queueRenderPage = (num) => { if (pageRendering) pageNumPending = num; else renderPage(num); };
-    window.changePdfPage = (offset) => { if (!pdfDoc) return; const newPage = pageNum + offset; if (newPage >= 1 && newPage <= pdfDoc.numPages) { pageNum = newPage; queueRenderPage(pageNum); } };
-    window.closePdfViewer = () => { document.getElementById('pdf-viewer-modal').style.display = 'none'; pdfDoc = null; ctx.clearRect(0, 0, canvas.width, canvas.height); currentNoteContext = "Nota General"; };
-
-    /* --- D. GESTIÓN DE NOTAS (LOCALSTORAGE) --- */
-    window.openNoteModalFromPdf = () => {
-        document.getElementById('note-context-label').innerText = currentNoteContext;
-        document.getElementById('current-note-text').value = '';
-        document.getElementById('notes-modal').style.display = 'flex';
+            input.value = '';
+        } catch(err) { alert("Error al comentar"); }
     };
 
-    // FUNCIÓN PARA EL FAB (LÁPIZ)
-    window.openGeneralNote = () => {
-        currentNoteContext = "Nota General";
-        document.getElementById('note-context-label').innerText = currentNoteContext;
-        document.getElementById('current-note-text').value = '';
-        document.getElementById('notes-modal').style.display = 'flex';
+    window.deleteComment = async (pid, cid) => {
+        if(!confirm("ADMIN: ¿Borrar comentario?")) return;
+        await deleteDoc(doc(db, "publicaciones", pid, "comentarios", cid));
     };
 
-    window.saveCurrentNote = () => {
-        const text = document.getElementById('current-note-text').value.trim();
-        if(!text) return;
+    /* --- E. NOTAS PERSONALES (LOCALSTORAGE) --- */
+    const localNotes = localStorage.getItem('my_personal_notes');
+    if(localNotes) document.getElementById('user-notes').value = localNotes;
 
-        const newNote = { id: Date.now(), text: text, context: currentNoteContext, date: new Date().toLocaleDateString() };
-        savedNotes.unshift(newNote); 
-        localStorage.setItem('my_saved_notes_v2', JSON.stringify(savedNotes));
-        
+    window.saveNotes = () => {
+        const text = document.getElementById('user-notes').value;
+        localStorage.setItem('my_personal_notes', text);
         document.getElementById('notes-modal').style.display = 'none';
-        showModal("Nota Guardada", "Se ha añadido a 'Mis Notas'.");
-        if(document.getElementById('mis-notas').classList.contains('active')) renderSavedNotes();
+        showModal("Notas Guardadas", "Tus notas están seguras.");
     };
 
-    window.deleteNote = (id) => {
-        if(!confirm("¿Borrar esta nota?")) return;
-        savedNotes = savedNotes.filter(n => n.id !== id);
-        localStorage.setItem('my_saved_notes_v2', JSON.stringify(savedNotes));
-        renderSavedNotes();
-    };
-
-    function renderSavedNotes() {
-        const container = document.getElementById('saved-notes-list');
-        container.innerHTML = '';
-        if(savedNotes.length === 0) { container.innerHTML = '<p style="text-align:center; color:#777">No tienes notas guardadas aún.</p>'; return; }
-        savedNotes.forEach(note => {
-            const div = document.createElement('div');
-            div.className = 'saved-note-card';
-            div.innerHTML = `<button class="delete-note-btn" onclick="deleteNote(${note.id})">🗑️</button><span class="note-timestamp">${note.date} - ${note.context}</span><div class="note-preview">${note.text}</div>`;
-            container.appendChild(div);
-        });
-    }
-
-    /* --- 9. INIT --- */
+    /* --- 9. INICIO --- */
     navigate('recientes');
     if(isAdminMode) toggleAdminForms(true);
 
@@ -1020,3 +1353,4 @@
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
 </body>
 </html>
+
