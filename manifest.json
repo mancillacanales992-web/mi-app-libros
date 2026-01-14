@@ -1,0 +1,22 @@
+{
+  "name": "MI BIBLIOTECA CRISTIANO",
+  "short_name": "BibliaApp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1e1e24",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Picsart_26-01-13_18-35-44-917.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Picsart_26-01-13_18-35-44-917.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
