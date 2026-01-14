@@ -351,6 +351,9 @@
         .fav-heart.active { fill: #ff0055; filter: drop-shadow(0 0 8px #ff0055); }
 
     </style>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e1e24">
+
 </head>
 <body>
 
@@ -1351,6 +1354,14 @@
 
 </script>
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js');
+    });
+  }
+</script>
+
 </body>
 </html>
 
