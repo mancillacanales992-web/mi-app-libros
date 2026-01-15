@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Verdad de Dios - App Ultimate</title>
+    <title>MI BIBLIOTECA - App Ultimate</title>
 
     <style>
         html, body { overscroll-behavior-y: contain; }
@@ -46,11 +46,41 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
+        /* --- NUEVO: FAB (Botón Flotante) --- */
+        .fab-btn {
+            position: fixed; bottom: 75px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            z-index: 600; font-size: 24px; border: none; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
+        .fab-btn svg { width: 28px; height: 28px; fill: currentColor; }
+
+        /* --- NUEVO: Términos y Condiciones --- */
+        .terms-container {
+            display: flex; align-items: flex-start; gap: 10px; margin: 15px 0;
+            text-align: left; font-size: 11px; color: var(--text-muted);
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;
+        }
+        .terms-link { color: var(--accent); text-decoration: underline; cursor: pointer; margin-left: 3px; }
+
+        /* --- NUEVO: Contador de Usuarios (Robot) --- */
+        .online-counter {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px;
+            font-size: 11px; color: var(--accent); border: 1px solid var(--ui-border);
+            margin-bottom: 15px;
+        }
+        .online-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; box-shadow: 0 0 5px #00e676; }
+        
         /* --- 2. MODAL DE NOTAS (REDISEÑO GLASS/MODERNO) --- */
         #notes-modal .modal-content {
-            background: rgba(20, 20, 25, 0.95); /* Fondo oscuro profundo */
+            background: rgba(20, 20, 25, 0.95);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--accent); /* Borde neón */
+            border: 1px solid var(--accent);
             box-shadow: 0 0 25px rgba(0,0,0,0.8), 0 0 10px var(--accent-glow);
             max-width: 90%; width: 350px;
             border-radius: 20px;
@@ -58,10 +88,10 @@
         
         .notes-textarea {
             width: 100%; box-sizing: border-box;
-            background: rgba(255,255,255,0.05); /* Ligeramente visible */
+            background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px; padding: 15px;
-            color: #eee; font-family: 'Courier New', monospace; /* Estilo máquina */
+            color: #eee; font-family: 'Courier New', monospace;
             font-size: 14px; line-height: 1.5; resize: none; outline: none;
             margin-top: 10px; transition: 0.3s;
         }
@@ -72,7 +102,7 @@
         }
 
         /* --- 3. MODAL DE PERFIL (ONBOARDING) --- */
-        #profile-setup-modal { z-index: 10000; } /* Encima de todo */
+        #profile-setup-modal { z-index: 10000; }
         
         .avatar-grid {
             display: flex; justify-content: center; gap: 10px; margin: 20px 0;
@@ -116,12 +146,24 @@
         .post-author { font-size: 14px; font-weight: bold; color: var(--text-main); display: block; }
         .post-date { font-size: 11px; color: var(--text-muted); }
         
-        /* Botón Admin Borrar */
+        /* Etiquetas y Botones Admin */
+        .admin-badge {
+            color: #ffd700; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;
+            padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 5px;
+            vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
         .post-del-btn { 
             color: var(--disagree-color); background: rgba(255, 23, 68, 0.1); 
             border: 1px solid var(--disagree-color); border-radius: 5px;
             font-size: 14px; cursor: pointer; padding: 5px 10px; 
             position: absolute; top: 15px; right: 15px;
+        }
+        .ban-btn {
+            color: #ffcc00; background: rgba(255, 204, 0, 0.1);
+            border: 1px solid #ffcc00; border-radius: 5px;
+            font-size: 10px; cursor: pointer; padding: 3px 6px;
+            margin-left: 5px;
         }
 
         .post-title { font-size: 17px; color: var(--accent); margin: 8px 0; font-weight: bold; }
@@ -186,6 +228,7 @@
             box-shadow: 0 0 5px var(--accent-glow); transition: 0.3s;
         }
         .btn-neon:hover { background: var(--accent); color: var(--bg-wall); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-neon:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
         
         .btn-google {
             background: white; color: #333; border: none; padding: 12px; width: 100%; 
@@ -205,6 +248,15 @@
         }
         .search-box input { background: transparent; border: none; width: 100%; outline: none; color: white; }
         
+        /* Botón Notas Rediseñado (Header) */
+        .notes-header-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--accent); 
+            color: var(--accent); border-radius: 20px; padding: 8px 15px; 
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: bold; transition: 0.3s; white-space: nowrap;
+        }
+        .notes-header-btn:hover { background: var(--accent); color: #000; }
+
         .nav-tabs { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--ui-border); }
         .nav-tabs button {
             flex: 1; padding: 15px 0; background: none; border: none; font-size: 11px; font-weight: 700;
@@ -310,13 +362,7 @@
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* Botones de Notas (Ubicación) */
-        .header-note-btn { 
-            background: none; border: 1px solid var(--accent); color: var(--accent); 
-            border-radius: 50%; width: 32px; height: 32px; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; margin-left: 10px; 
-            font-size: 16px; transition: 0.3s;
-        }
+        /* Botón Notas Intro */
         .intro-note-btn { 
             background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent); 
             color: var(--text-main); width: 100%; padding: 12px; border-radius: 8px; 
@@ -351,14 +397,14 @@
         .fav-heart.active { fill: #ff0055; filter: drop-shadow(0 0 8px #ff0055); }
 
     </style>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e1e24">
-
 </head>
 <body>
 
 <div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
 
+<button class="fab-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
+    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+</button>
 <div id="notes-modal" class="modal-overlay">
     <div class="modal-content">
         <h3 style="color:var(--accent); margin-top:0; font-family:'Courier New', monospace;">📝 BLOC DE NOTAS</h3>
@@ -390,7 +436,25 @@
         </div>
         <input type="hidden" id="selected-avatar-val">
 
-        <button class="btn-neon" onclick="saveUserProfile()">GUARDAR Y CONTINUAR</button>
+        <div class="terms-container">
+            <input type="checkbox" id="terms-check" onchange="toggleSaveBtn()">
+            <span>Acepto los <span class="terms-link" onclick="showTerms()">Términos y Condiciones</span> de la comunidad.</span>
+        </div>
+
+        <button id="btn-save-profile" class="btn-neon" onclick="saveUserProfile()" disabled>GUARDAR Y CONTINUAR</button>
+    </div>
+</div>
+
+<div id="terms-modal" class="modal-overlay" style="z-index:10001;">
+    <div class="modal-content" style="text-align:left; max-height:60vh; overflow-y:auto;">
+        <h4 style="color:var(--accent); margin-top:0;">📜 Reglas de Convivencia</h4>
+        <ul style="font-size:12px; color:var(--text-muted); padding-left:15px; line-height:1.6;">
+            <li>Respeto mutuo y lenguaje apropiado.</li>
+            <li>No publicar contenido ofensivo o spam.</li>
+            <li>El Admin puede bloquear usuarios conflictivos.</li>
+            <li>La app se reserva el derecho de admisión.</li>
+        </ul>
+        <button class="btn-neon" onclick="document.getElementById('terms-modal').style.display='none'">ENTENDIDO</button>
     </div>
 </div>
 
@@ -454,27 +518,27 @@
         <div class="drawer-item" onclick="navigate('ayuda'); toggleDrawer()"><svg class="icon"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda y Reportes</div>
     </div>
 </div>
-
 <header class="app-header">
     <div class="header-top">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer;">☰</div>
-            <button class="header-note-btn" onclick="document.getElementById('notes-modal').style.display='flex'">✎</button>
-        </div>
+        <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer; margin-right:10px;">☰</div>
+        
         <div class="search-box">
             <span style="color:#777">🔍</span> 
             <input type="text" id="searchInput" placeholder="Buscar libro..." onkeyup="searchBooks(this.value)">
         </div>
+
+        <button class="notes-header-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
+            📝 Notas
+        </button>
     </div>
     <nav class="nav-tabs">
         <button id="tab-recientes" class="active" onclick="navigate('recientes')">Inicio</button>
         <button id="tab-nube" onclick="navigate('nube')">Nube</button>
         <button id="tab-versiculo" onclick="navigate('versiculo')">Versículo</button>
         <button id="tab-videos" onclick="navigate('videos')">Videos</button>
-        <button id="tab-debate" onclick="navigate('debate')">Debate</button>
+        <button id="tab-debate" onclick="navigate('debate')">Comunidad</button>
     </nav>
 </header>
-
 <main id="main-content">
 
     <div id="recientes" class="page-section active">
@@ -513,6 +577,13 @@
     <div id="debate" class="page-section">
         <div style="max-width: 600px; margin: 0 auto; padding: 10px;">
             
+            <div style="text-align:center;">
+                <div class="online-counter">
+                    <div class="online-dot"></div>
+                    <span id="live-user-count">Calculando...</span> usuarios leyendo ahora
+                </div>
+            </div>
+
             <div id="feed-login-prompt" style="text-align:center; padding:30px; background:var(--ui-bg); border-radius:12px; margin-bottom:20px; border:1px solid var(--ui-border);">
                 <div style="font-size:50px; margin-bottom:10px">👥</div>
                 <h3 style="color:var(--accent); margin-top:0">Únete a la Comunidad</h3>
@@ -529,7 +600,7 @@
                         <span id="user-avatar-display" class="post-avatar">?</span>
                         <span id="user-name-display" style="font-weight:bold; color:var(--text-main); font-size:14px;">Usuario</span>
                     </div>
-                    <button onclick="logout()" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; font-size:11px; cursor:pointer;">Cerrar sesión</button>
+                    <button id="btn-logout-feed" onclick="logout()" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; font-size:11px; cursor:pointer;">Cerrar sesión</button>
                 </div>
                 
                 <input type="text" id="postTitle" class="input-box" placeholder="Título de tu tema..." style="margin-bottom:8px; padding:10px;">
@@ -542,18 +613,21 @@
             </div>
         </div>
     </div>
-
     <div id="videos" class="page-section">
-        <div id="admin-video-form" style="display:none; margin:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px; z-index:20; position:relative;">
-            <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Subir Video</h4>
+        <div id="video-upload-form" style="display:none; margin:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px; z-index:20; position:relative;">
+            <h4 style="margin:0 0 10px 0; color:var(--accent)">🎥 Compartir Video (YouTube)</h4>
             <input type="text" id="vidTitle" class="input-box" placeholder="Título del Video">
             <input type="text" id="vidDesc" class="input-box" placeholder="Descripción breve">
             <input type="url" id="vidUrl" class="input-box" placeholder="Link de YouTube">
             <button class="btn-neon" onclick="uploadVideo()">AGREGAR VIDEO</button>
         </div>
+        
+        <div id="btn-show-video-form" style="padding:15px; text-align:center; display:none;">
+            <button class="btn-neon" onclick="toggleVideoForm()" style="font-size:12px; padding:8px 20px;">+ SUBIR VIDEO</button>
+        </div>
+
         <div id="video-list" style="padding:15px; padding-bottom:80px; z-index:10; position:relative;"></div>
     </div>
-
     <div id="favoritos" class="page-section">
         <h2 style="text-align:center;color:var(--text-main);text-shadow:0 0 10px var(--accent);">Mis Favoritos ❤️</h2>
         <div class="shelf-grid" id="grid-favoritos"></div>
@@ -742,7 +816,6 @@
     /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-    /* IMPORTANTE: Agregamos getDoc para verificar perfiles de usuario */
     import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, getDoc, doc, onSnapshot, query, orderBy, serverTimestamp, where, limit, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -761,15 +834,10 @@
     /* --- 1.1 MANEJO RETORNO LOGIN (MÓVILES) --- */
     getRedirectResult(auth)
         .then((result) => {
-            if (result) {
-                console.log("Regreso de Google exitoso.");
-                // La lógica de perfil se maneja en onAuthStateChanged (Parte 4)
-            }
+            if (result) console.log("Regreso de Google exitoso.");
         })
         .catch((error) => {
-            if (error.code !== 'auth/popup-closed-by-user') {
-                console.error("Error Login:", error);
-            }
+            if (error.code !== 'auth/popup-closed-by-user') console.error("Error Login:", error);
         });
 
     /* --- 2. ESTADO GLOBAL --- */
@@ -780,10 +848,11 @@
     let isAdminMode = localStorage.getItem('is_admin_active') === 'true'; 
     let hasShownUpdate = false; 
     let leavesInterval, rainInterval; 
+    let robotInterval; // Variable para el robot de usuarios
     
     // VARIABLES DE USUARIO
     window.currentUser = null;       // Objeto de Auth de Google
-    window.currentUserProfile = null; // Objeto de Firestore (Nick + Avatar)
+    window.currentUserProfile = null; // Objeto de Firestore (Nick + Avatar + Estado)
 
     /* --- 3. LISTENERS BASE DE DATOS (CONTENIDO) --- */
     
@@ -806,10 +875,11 @@
         renderVerse(docSnap.exists() ? docSnap.data() : null);
     });
 
-    // Configuración Alerta
+    // Configuración Alerta (ACTUALIZACIONES)
     onSnapshot(doc(db, "configuracion", "alerta_update"), (docSnap) => {
         if (docSnap.exists()) {
             updateConfig = docSnap.data();
+            // Mostrar modal solo si está activo y no se ha mostrado en esta sesión
             if (updateConfig.status === 'on' && !hasShownUpdate) {
                 document.getElementById('upd-title').innerText = updateConfig.title || "Actualización";
                 document.getElementById('upd-msg').innerText = updateConfig.msg || "Nueva versión disponible.";
@@ -818,6 +888,7 @@
                 document.getElementById('update-modal').style.display = 'flex';
                 hasShownUpdate = true;
             }
+            // Llenar formulario Admin si está activo
             if (isAdminMode) {
                 document.getElementById('updStatus').value = updateConfig.status;
                 document.getElementById('updTitleInput').value = updateConfig.title;
@@ -834,8 +905,7 @@
         if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
         toggleAdminForms(isAdminMode);
     }
-
-    /* --- 4. ADMIN MODE --- */
+    /* --- 4. ADMIN MODE (CONTROL TOTAL) --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
@@ -843,6 +913,8 @@
             toggleAdminForms(false);
             alert("Modo Admin: DESACTIVADO");
             refreshActiveViews();
+            updateUserUI(); // Refresco visual inmediato
+            initSocialFeed(); // Quitar botones de borrar del muro
             return;
         }
         const pass = prompt("🔒 Contraseña Admin:");
@@ -850,11 +922,14 @@
             isAdminMode = true;
             localStorage.setItem('is_admin_active', 'true');
             toggleAdminForms(true);
-            alert("✅ Modo Admin: ACTIVADO\nAhora verás botones para BORRAR posts.");
+            alert("✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
             refreshActiveViews();
-            // Refrescar feed si estamos ahí para mostrar botones de borrar
-            if(document.getElementById('debate').classList.contains('active')) initSocialFeed();
             
+            // --- CORRECCIÓN SOLICITADA: REFRESCO INSTANTÁNEO ---
+            updateUserUI();   // Fuerza la aparición de la caja de postear
+            initSocialFeed(); // Fuerza la aparición de botones de borrar/banear
+            
+            // Cargar datos de update form
             if(updateConfig) {
                 document.getElementById('updStatus').value = updateConfig.status || 'off';
                 document.getElementById('updTitleInput').value = updateConfig.title || '';
@@ -868,10 +943,8 @@
 
     function toggleAdminForms(show) {
         const display = show ? 'block' : 'none';
-        const vForm = document.getElementById('admin-video-form');
         const verseForm = document.getElementById('admin-verse-form');
         const updForm = document.getElementById('admin-update-form');
-        if(vForm) vForm.style.display = display;
         if(verseForm) verseForm.style.display = display;
         if(updForm) updForm.style.display = display;
     }
@@ -889,7 +962,7 @@
 
     window.deleteItem = async function(collectionName, id) {
         if(event) event.stopPropagation();
-        if(!confirm("⚠️ ¿ELIMINAR DEFINITIVAMENTE?")) return;
+        if(!confirm("⚠️ ADMIN: ¿ELIMINAR ESTE ELEMENTO?")) return;
         try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert("Error: " + e.message); }
     };
 
@@ -950,8 +1023,38 @@
         
         refreshActiveViews();
         
-        if(id === 'videos') startRain(); else stopRain();
+        // EFECTOS Y ROBOT
+        if(id === 'videos') {
+            startRain(); 
+            updateVideoUploadUI();
+        } else {
+            stopRain();
+        }
+
+        if(id === 'debate') {
+            startUserCounter(); 
+        } else {
+            stopUserCounter();
+        }
+
         if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
+    }
+
+    // ROBOT DE USUARIOS
+    function startUserCounter() {
+        const el = document.getElementById('live-user-count');
+        if(!el) return;
+        el.innerText = Math.floor(Math.random() * (12 - 4 + 1) + 4);
+        
+        if(robotInterval) clearInterval(robotInterval);
+        robotInterval = setInterval(() => {
+            const count = Math.floor(Math.random() * (15 - 4 + 1) + 4);
+            el.innerText = count;
+        }, 5000); 
+    }
+    
+    function stopUserCounter() {
+        if(robotInterval) clearInterval(robotInterval);
     }
 
     window.searchBooks = function(q) {
@@ -989,7 +1092,6 @@
                     </div>`;
                 }
                 
-                // CLICK: Pestaña nueva ( window.open )
                 div.innerHTML = `<div class="book-title">${b.title}</div>${adminBtns}<svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${coverHtml}`;
                 div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
                 div.onclick = () => window.open(b.pdfLink, '_blank');
@@ -1010,10 +1112,13 @@
     function renderVideoList(list = youtubeVideos) {
         const c = document.getElementById('video-list'); c.innerHTML = '';
         if(!list.length) { c.innerHTML = '<p style="text-align:center;color:#777">No hay videos</p>'; return; }
+        
         list.forEach(v => {
             const vid = getYoutubeId(v.url);
             const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
             const card = document.createElement('div'); card.className = 'video-card';
+            
+            // Botones Admin (CONTROL TOTAL)
             let adminBtns = '';
             if(isAdminMode) {
                 adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
@@ -1021,7 +1126,37 @@
                     <button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px; cursor:pointer; font-weight:bold;">🗑️ BORRAR</button>
                 </div>`;
             }
-            card.innerHTML = `<img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')"><div class="video-info"><div class="video-title">${v.title}</div><div class="video-desc">${v.desc||''}</div></div>${adminBtns}`;
+
+            // Datos del uploader
+            let uploaderHtml = '';
+            let avatarDisplay = v.uploaderAvatar || '👤';
+            let nameDisplay = v.uploaderName || 'Anónimo';
+            let badge = '';
+
+            // Si el nombre es ADMINISTRADOR, poner Escudo
+            if(nameDisplay === 'ADMINISTRADOR') {
+                avatarDisplay = '🛡️';
+                badge = '<span class="admin-badge">ADMIN</span>';
+            }
+
+            if(v.uploaderName) {
+                uploaderHtml = `
+                    <div style="display:flex; align-items:center; gap:8px; padding:0 15px 10px 15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="width:20px; height:20px; border-radius:50%; background:#444; font-size:12px; display:flex; align-items:center; justify-content:center;">${avatarDisplay}</div>
+                        <span style="font-size:11px; color:var(--text-muted);">${nameDisplay} ${badge}</span>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')">
+                <div class="video-info">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-desc">${v.desc||''}</div>
+                </div>
+                ${uploaderHtml}
+                ${adminBtns}
+            `;
             c.appendChild(card);
         });
     }
@@ -1031,12 +1166,6 @@
     window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
     window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
     
-    window.uploadVideo = async function() {
-        const t = document.getElementById('vidTitle').value, d = document.getElementById('vidDesc').value, u = document.getElementById('vidUrl').value;
-        if(!t || !u) return alert("Faltan datos");
-        try { await addDoc(collection(db, "videos"), { title:t, desc:d, url:u, timestamp: serverTimestamp() }); showModal("Listo", "Video subido."); } catch(e){alert(e.message);}
-    };
-
     window.uploadBookToCloud = async function() {
         const t = document.getElementById('pubTitle').value, a = document.getElementById('pubAuthor').value, l = document.getElementById('pubLink').value, c = document.getElementById('pubCover').value;
         const btn = document.querySelector('#publishForm .btn-neon');
@@ -1064,6 +1193,7 @@
 
     function stringToColor(str) { let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash); let c='#'; for(let i=0;i<3;i++) c+=('00'+((hash>>(i*8))&0xFF).toString(16)).substr(-2); return c; }
     function toggleFav(b, el) { const idx=favorites.findIndex(f=>f.title===b.title); if(idx===-1){favorites.push(b);if(el)el.classList.add('active');}else{favorites.splice(idx,1);if(el)el.classList.remove('active');if(document.getElementById('favoritos').classList.contains('active'))renderLibrary('grid-favoritos',favorites);} localStorage.setItem('my_fav_books',JSON.stringify(favorites)); }
+    
     /* ================================================================= */
     /* === 8. LÓGICA AVANZADA: AUTH, PERFIL Y MURO SOCIAL === */
     /* ================================================================= */
@@ -1081,15 +1211,12 @@
 
     window.logout = () => {
         signOut(auth);
-        window.location.reload(); // Recargar para limpiar estados
+        window.location.reload(); 
     };
 
     // MONITOR DE ESTADO
     onAuthStateChanged(auth, async (user) => {
         window.currentUser = user; 
-        
-        const loginPrompt = document.getElementById('feed-login-prompt');
-        const createPostCard = document.getElementById('create-post-container');
         
         if (user) {
             // 1. USUARIO AUTENTICADO -> VERIFICAR PERFIL EN DB
@@ -1097,50 +1224,90 @@
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                // A. YA TIENE PERFIL: Cargar datos y mostrar UI
                 window.currentUserProfile = userSnap.data();
+                if(window.currentUserProfile.status === 'bloqueado') {
+                    alert("🚫 TU CUENTA HA SIDO BLOQUEADA POR EL ADMINISTRADOR.");
+                }
                 updateUserUI();
             } else {
-                // B. NUEVO USUARIO: Mostrar Modal de Configuración
-                document.getElementById('profile-nick').value = user.displayName; // Precargar nombre Google
+                document.getElementById('profile-nick').value = user.displayName; 
                 document.getElementById('profile-setup-modal').style.display = 'flex';
             }
-
-            if(loginPrompt) loginPrompt.style.display = 'none';
         } else {
-            // USUARIO ANÓNIMO
-            if(loginPrompt) loginPrompt.style.display = 'block';
-            if(createPostCard) createPostCard.style.display = 'none';
+            updateUserUI(); // Actualizar UI incluso si no hay usuario (para caso Admin)
         }
-        
-        // Cargar el feed (visible para todos)
+
+        updateVideoUploadUI();
         initSocialFeed();
     });
 
-    // A.1 FUNCIONES DEL MODAL DE PERFIL
+    // --- CORRECCIÓN SOLICITADA: INTERFAZ SOCIAL (PRIORIDAD ADMIN) ---
+    function updateUserUI() {
+        const loginPrompt = document.getElementById('feed-login-prompt');
+        const createPostCard = document.getElementById('create-post-container');
+
+        // Si es Admin, siempre puede postear. Si no, necesita usuario y perfil.
+        const canPost = isAdminMode || (window.currentUser && window.currentUserProfile);
+
+        if (canPost) {
+            loginPrompt.style.display = 'none';
+            createPostCard.style.display = 'block';
+
+            // Si es Admin puro (sin login de google), forzar identidad visual en la caja
+            if (isAdminMode && !window.currentUserProfile) {
+                document.getElementById('user-name-display').innerText = "ADMINISTRADOR";
+                document.getElementById('user-avatar-display').innerText = "🛡️";
+            } else if (window.currentUserProfile) {
+                document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
+                document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
+            }
+        } else {
+            // Si NO es admin y NO tiene usuario logueado, mostrar login
+            loginPrompt.style.display = 'block';
+            createPostCard.style.display = 'none';
+        }
+        
+        updateVideoUploadUI();
+    }
+
+    // A.1 FUNCIONES DE PERFIL
     window.selectAvatar = (emoji, el) => {
         document.querySelectorAll('.avatar-option').forEach(d => d.classList.remove('selected'));
         el.classList.add('selected');
         document.getElementById('selected-avatar-val').value = emoji;
     };
 
+    window.toggleSaveBtn = () => {
+        const chk = document.getElementById('terms-check');
+        const btn = document.getElementById('btn-save-profile');
+        btn.disabled = !chk.checked;
+        if(chk.checked) btn.style.opacity = "1"; else btn.style.opacity = "0.5";
+    };
+
+    window.showTerms = () => {
+        document.getElementById('terms-modal').style.display = 'flex';
+    };
+
     window.saveUserProfile = async () => {
         const nick = document.getElementById('profile-nick').value.trim();
         const avatar = document.getElementById('selected-avatar-val').value;
+        const terms = document.getElementById('terms-check').checked;
 
         if(!nick || !avatar) return alert("Por favor elige un Nickname y un Avatar.");
+        if(!terms) return alert("Debes aceptar los Términos y Condiciones.");
 
         const userData = {
             uid: window.currentUser.uid,
             nickname: nick,
             avatar: avatar,
-            email: window.currentUser.email, // Opcional, para admin
+            email: window.currentUser.email,
+            status: 'activo', 
             createdAt: serverTimestamp()
         };
 
         try {
             await setDoc(doc(db, "usuarios", window.currentUser.uid), userData);
-            window.currentUserProfile = userData; // Guardar en memoria
+            window.currentUserProfile = userData; 
             document.getElementById('profile-setup-modal').style.display = 'none';
             updateUserUI();
             showModal("¡Bienvenido!", "Perfil creado con éxito.");
@@ -1149,22 +1316,76 @@
         }
     };
 
-    function updateUserUI() {
-        // Actualizar la tarjeta de "Crear Publicación"
-        const card = document.getElementById('create-post-container');
-        if(card && window.currentUserProfile) {
-            card.style.display = 'block';
-            document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
-            document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
+    /* --- B. LÓGICA HÍBRIDA DE VIDEOS (ADMIN vs USER) --- */
+    
+    window.updateVideoUploadUI = function() {
+        const btnContainer = document.getElementById('btn-show-video-form');
+        if (!btnContainer) return;
+        // Mostrar botón si es Admin O si es Usuario Registrado
+        if (isAdminMode || window.currentUserProfile) {
+            btnContainer.style.display = 'block';
+        } else {
+            btnContainer.style.display = 'none';
         }
-    }
+    };
 
-    /* --- B. MURO SOCIAL (FEED) --- */
+    window.toggleVideoForm = function() {
+        if (!isAdminMode && !window.currentUserProfile) {
+            return alert("Para subir videos debes iniciar sesión.");
+        }
+        if (window.currentUserProfile && window.currentUserProfile.status === 'bloqueado') {
+            return alert("🚫 Tu cuenta está bloqueada.");
+        }
+        const form = document.getElementById('video-upload-form');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    };
+
+    window.uploadVideo = async function() {
+        const t = document.getElementById('vidTitle').value;
+        const d = document.getElementById('vidDesc').value;
+        const u = document.getElementById('vidUrl').value;
+        
+        if(!t || !u) return alert("Faltan datos");
+
+        let uploaderName, uploaderAvatar, uploaderUid;
+
+        // --- Lógica de identidad Admin en Videos ---
+        if (isAdminMode) {
+            uploaderName = "ADMINISTRADOR";
+            uploaderAvatar = "🛡️"; 
+            uploaderUid = "admin_system";
+        } else if (window.currentUserProfile) {
+            if(window.currentUserProfile.status === 'bloqueado') return alert("Bloqueado");
+            uploaderName = window.currentUserProfile.nickname;
+            uploaderAvatar = window.currentUserProfile.avatar;
+            uploaderUid = window.currentUser.uid;
+        } else {
+            return alert("Error de permisos.");
+        }
+
+        try { 
+            await addDoc(collection(db, "videos"), { 
+                title: t, desc: d, url: u, 
+                timestamp: serverTimestamp(),
+                uploaderUid: uploaderUid,
+                uploaderName: uploaderName,
+                uploaderAvatar: uploaderAvatar
+            }); 
+            showModal("Listo", "Video compartido con la comunidad."); 
+            document.getElementById('video-upload-form').style.display = 'none'; 
+            document.getElementById('vidTitle').value = '';
+            document.getElementById('vidDesc').value = '';
+            document.getElementById('vidUrl').value = '';
+        } catch(e){
+            alert(e.message);
+        }
+    };
+
+    /* --- C. MURO SOCIAL (FEED) --- */
     let unsubscribeFeed = null;
 
     function initSocialFeed() {
         if(unsubscribeFeed) unsubscribeFeed();
-
         const container = document.getElementById('feed-container');
         if(!container) return;
 
@@ -1186,19 +1407,33 @@
                 const userLiked = window.currentUser && likes.includes(window.currentUser.uid);
                 const userDisagreed = window.currentUser && disagrees.includes(window.currentUser.uid);
 
-                // BOTÓN BORRAR (ADMIN)
-                let deleteBtn = isAdminMode ? `<button class="post-del-btn" onclick="deletePost('${pid}')">🗑️</button>` : '';
+                // BOTONES ADMIN (BORRAR / BANEAR)
+                let adminControls = '';
+                if (isAdminMode) {
+                    adminControls = `
+                        <button class="post-del-btn" onclick="deletePost('${pid}')">🗑️</button>
+                        <button class="ban-btn" onclick="banUser('${post.authorUid}', '${post.authorName}')">🚫 BAN</button>
+                    `;
+                }
 
+                // Badge Admin en Posts
+                let badge = '';
+                if(post.authorName === 'ADMINISTRADOR') {
+                    badge = '<span class="admin-badge">ADMIN</span>';
+                }
+                
                 const card = document.createElement('div');
                 card.className = 'social-card';
                 card.innerHTML = `
                     <div class="post-header">
                         <div class="post-avatar">${post.authorAvatar || '?'}</div>
                         <div class="post-meta">
-                            <span class="post-author">${post.authorName || 'Anónimo'}</span>
+                            <span class="post-author">
+                                ${post.authorName || 'Anónimo'} ${badge}
+                                ${adminControls}
+                            </span>
                             <span class="post-date">${post.dateStr || ''}</span>
                         </div>
-                        ${deleteBtn}
                     </div>
                     <div class="post-title">${post.title || ''}</div>
                     <div class="post-body">${post.text || ''}</div>
@@ -1217,7 +1452,7 @@
 
                     <div id="comments-${pid}" class="comments-section">
                         <div id="comments-list-${pid}"></div>
-                        ${window.currentUser ? `
+                        ${(window.currentUser || isAdminMode) ? `
                             <form onsubmit="postComment(event, '${pid}')" style="display:flex; gap:5px; margin-top:10px;">
                                 <input type="text" id="input-comment-${pid}" class="input-box" placeholder="Escribe un comentario..." style="margin:0; padding:8px; font-size:12px;">
                                 <button type="submit" style="background:var(--accent); border:none; border-radius:4px; color:#000; font-weight:bold; cursor:pointer;">➤</button>
@@ -1230,57 +1465,74 @@
         });
     }
 
-    /* --- C. ACCIONES DEL MURO --- */
+    /* --- D. ACCIONES SOCIALES --- */
+    
+    // --- CORRECCIÓN SOLICITADA: PUBLICAR COMO ADMIN ---
     window.createPost = async () => {
-        if(!window.currentUserProfile) return alert("Error de perfil. Recarga la página.");
-        
-        const title = document.getElementById('postTitle').value.trim();
-        const text = document.getElementById('postBody').value.trim();
+        let title = document.getElementById('postTitle').value.trim();
+        let text = document.getElementById('postBody').value.trim();
+        if(!title || !text) return alert("Escribe algo.");
 
-        if(!title || !text) return alert("Escribe algo para publicar.");
+        let pName, pAvatar, pUid;
+
+        // PRIORIDAD ADMIN
+        if (isAdminMode) {
+            pName = "ADMINISTRADOR";
+            pAvatar = "🛡️";
+            pUid = "admin_system";
+        } 
+        else {
+            // Usuario Normal
+            if(!window.currentUserProfile) return alert("Error de perfil.");
+            if(window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
+            pName = window.currentUserProfile.nickname;
+            pAvatar = window.currentUserProfile.avatar;
+            pUid = window.currentUser.uid;
+        }
 
         try {
             await addDoc(collection(db, "publicaciones"), {
-                title: title,
-                text: text,
-                // USAMOS DATOS DEL PERFIL PERSONALIZADO
-                authorName: window.currentUserProfile.nickname,
-                authorAvatar: window.currentUserProfile.avatar,
-                authorUid: window.currentUser.uid,
+                title: title, text: text,
+                authorName: pName,
+                authorAvatar: pAvatar,
+                authorUid: pUid,
                 timestamp: serverTimestamp(),
                 dateStr: new Date().toLocaleDateString(),
-                likes: [],
-                disagrees: []
+                likes: [], disagrees: []
             });
             document.getElementById('postTitle').value = '';
             document.getElementById('postBody').value = '';
             showModal("Publicado", "Tu tema está en el muro.");
-        } catch(e) {
-            console.error(e);
-            alert("Error al publicar: " + e.message);
-        }
+        } catch(e) { alert("Error: " + e.message); }
     };
 
     window.interactPost = async (pid, type) => {
-        if(!window.currentUser) return alert("Inicia sesión para votar.");
+        if(!window.currentUser) return alert("Regístrate para participar.");
+        if(window.currentUserProfile && window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
         const uid = window.currentUser.uid;
         const ref = doc(db, "publicaciones", pid);
-        
         try {
-            if(type === 'like') {
-                await updateDoc(ref, { likes: arrayUnion(uid), disagrees: arrayRemove(uid) });
-            } else {
-                await updateDoc(ref, { disagrees: arrayUnion(uid), likes: arrayRemove(uid) });
-            }
+            if(type === 'like') await updateDoc(ref, { likes: arrayUnion(uid), disagrees: arrayRemove(uid) });
+            else await updateDoc(ref, { disagrees: arrayUnion(uid), likes: arrayRemove(uid) });
         } catch(e) { console.error(e); }
     };
 
+    /* --- E. SISTEMA DE BANEO Y BORRADO (ADMIN) --- */
     window.deletePost = async (pid) => {
-        if(!confirm("ADMIN: ¿Borrar esta publicación?")) return;
+        if(!confirm("ADMIN: ¿Borrar post?")) return;
         try { await deleteDoc(doc(db, "publicaciones", pid)); } catch(e) { alert(e.message); }
     };
 
-    /* --- D. COMENTARIOS --- */
+    window.banUser = async (targetUid, targetName) => {
+        if(targetUid === 'admin_system') return alert("No puedes banear al admin.");
+        if(!confirm(`ADMIN: ¿BLOQUEAR a ${targetName}?\nNo podrá publicar nada más.`)) return;
+        try {
+            await updateDoc(doc(db, "usuarios", targetUid), { status: 'bloqueado' });
+            alert(`🚫 Usuario ${targetName} bloqueado.`);
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    /* --- F. COMENTARIOS --- */
     window.toggleComments = (pid) => {
         const sec = document.getElementById(`comments-${pid}`);
         if(sec.style.display === 'none' || sec.style.display === '') {
@@ -1297,13 +1549,15 @@
             listDiv.innerHTML = '';
             snap.forEach(d => {
                 const c = d.data();
-                const delBtn = isAdminMode ? `<span onclick="deleteComment('${pid}', '${d.id}')" style="color:red; cursor:pointer; font-size:10px; margin-left:5px;">[x]</span>` : '';
-                
+                let adminBtns = '';
+                if(isAdminMode) {
+                    adminBtns = `<span onclick="deleteComment('${pid}', '${d.id}')" style="color:red; cursor:pointer; font-size:10px; margin-left:5px;">[x]</span>`;
+                }
                 const item = document.createElement('div');
                 item.className = 'comment-item';
                 item.innerHTML = `
                     <div class="comment-header">
-                        <span class="comment-author">${c.authorAvatar || ''} ${c.authorName} ${delBtn}</span>
+                        <span class="comment-author">${c.authorAvatar || ''} ${c.authorName} ${adminBtns}</span>
                         <span style="color:#555; font-size:9px">${c.dateStr}</span>
                     </div>
                     <div class="comment-text">${c.text}</div>
@@ -1317,14 +1571,29 @@
         e.preventDefault();
         const input = document.getElementById(`input-comment-${pid}`);
         const text = input.value.trim();
-        if(!text || !window.currentUserProfile) return;
+        if(!text) return;
+
+        let cName, cAvatar, cUid;
+
+        // Soporte Admin en Comentarios
+        if (isAdminMode) {
+            cName = "ADMINISTRADOR";
+            cAvatar = "🛡️";
+            cUid = "admin_system";
+        } else {
+            if(!window.currentUserProfile) return alert("Regístrate para comentar.");
+            if(window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
+            cName = window.currentUserProfile.nickname;
+            cAvatar = window.currentUserProfile.avatar;
+            cUid = window.currentUser.uid;
+        }
 
         try {
             await addDoc(collection(db, "publicaciones", pid, "comentarios"), {
                 text: text,
-                authorName: window.currentUserProfile.nickname,
-                authorAvatar: window.currentUserProfile.avatar,
-                authorUid: window.currentUser.uid,
+                authorName: cName,
+                authorAvatar: cAvatar,
+                authorUid: cUid,
                 timestamp: serverTimestamp(),
                 dateStr: new Date().toLocaleDateString()
             });
@@ -1337,31 +1606,24 @@
         await deleteDoc(doc(db, "publicaciones", pid, "comentarios", cid));
     };
 
-    /* --- E. NOTAS PERSONALES (LOCALSTORAGE) --- */
+    /* --- G. NOTAS PERSONALES --- */
     const localNotes = localStorage.getItem('my_personal_notes');
     if(localNotes) document.getElementById('user-notes').value = localNotes;
-
     window.saveNotes = () => {
-        const text = document.getElementById('user-notes').value;
-        localStorage.setItem('my_personal_notes', text);
+        localStorage.setItem('my_personal_notes', document.getElementById('user-notes').value);
         document.getElementById('notes-modal').style.display = 'none';
         showModal("Notas Guardadas", "Tus notas están seguras.");
     };
 
-    /* --- 9. INICIO --- */
+    /* --- H. INICIO --- */
     navigate('recientes');
-    if(isAdminMode) toggleAdminForms(true);
+    if(isAdminMode) {
+        toggleAdminForms(true);
+        updateUserUI(); // Asegurar estado al cargar si ya era admin
+    }
 
 </script>
 <script src="https://pl28432883.effectivegatecpm.com/c6/1a/73/c61a737a59c460af3a624d83933f2177.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js');
-    });
-  }
-</script>
-
 </body>
 </html>
 
