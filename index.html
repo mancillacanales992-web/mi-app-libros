@@ -46,7 +46,26 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        /* --- NUEVO: FAB (Botón Flotante) --- */
+        /* --- NUEVO: Indicador Offline --- */
+        #offline-indicator {
+            position: fixed; top: 0; left: 0; width: 100%; height: 25px;
+            background: #ff1744; color: white; display: none; /* Oculto por defecto */
+            align-items: center; justify-content: center; font-size: 11px; font-weight: bold;
+            z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- NUEVO: Spinner de Carga --- */
+        .loading-container {
+            grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--text-muted);
+        }
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 10px;
+        }
+        @keyframes spin { to {transform: rotate(360deg);} }
+
+        /* --- FAB (Botón Flotante) --- */
         .fab-btn {
             position: fixed; bottom: 75px; right: 20px;
             width: 56px; height: 56px; border-radius: 50%;
@@ -59,7 +78,7 @@
         .fab-btn:active { transform: scale(0.9); }
         .fab-btn svg { width: 28px; height: 28px; fill: currentColor; }
 
-        /* --- NUEVO: Términos y Condiciones --- */
+        /* --- Términos y Condiciones --- */
         .terms-container {
             display: flex; align-items: flex-start; gap: 10px; margin: 15px 0;
             text-align: left; font-size: 11px; color: var(--text-muted);
@@ -67,7 +86,7 @@
         }
         .terms-link { color: var(--accent); text-decoration: underline; cursor: pointer; margin-left: 3px; }
 
-        /* --- NUEVO: Contador de Usuarios (Robot) --- */
+        /* --- Contador de Usuarios (Robot) --- */
         .online-counter {
             display: inline-flex; align-items: center; gap: 6px;
             background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px;
@@ -400,6 +419,8 @@
 </head>
 <body>
 
+<div id="offline-indicator">⚠️ Sin conexión a internet</div>
+
 <div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
 
 <button class="fab-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
@@ -536,7 +557,7 @@
         <button id="tab-nube" onclick="navigate('nube')">Nube</button>
         <button id="tab-versiculo" onclick="navigate('versiculo')">Versículo</button>
         <button id="tab-videos" onclick="navigate('videos')">Videos</button>
-        <button id="tab-debate" onclick="navigate('debate')">Comunidad</button>
+        <button id="tab-debate" onclick="navigate('debate')">Debate</button>
     </nav>
 </header>
 <main id="main-content">
@@ -845,14 +866,18 @@
     let youtubeVideos = [];
     let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
     let updateConfig = { status: 'off', title: '', msg: '', link: '' }; 
-    let isAdminMode = localStorage.getItem('is_admin_active') === 'true'; 
+    
+    // VARIABLES DE SEGURIDAD Y CARGA
+    let isAdminMode = false;  // FALSE por defecto (Seguridad)
+    let isLoading = true;     // Variable para controlar la animación de carga
+
     let hasShownUpdate = false; 
     let leavesInterval, rainInterval; 
-    let robotInterval; // Variable para el robot de usuarios
+    let robotInterval; 
     
     // VARIABLES DE USUARIO
-    window.currentUser = null;       // Objeto de Auth de Google
-    window.currentUserProfile = null; // Objeto de Firestore (Nick + Avatar + Estado)
+    window.currentUser = null;       
+    window.currentUserProfile = null; 
 
     /* --- 3. LISTENERS BASE DE DATOS (CONTENIDO) --- */
     
@@ -860,6 +885,7 @@
     onSnapshot(query(collection(db, "libros"), orderBy("timestamp", "desc")), (snapshot) => {
         cloudBooks = [];
         snapshot.forEach((doc) => cloudBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
+        isLoading = false; // ¡IMPORTANTE! Terminó de cargar
         refreshActiveViews();
     });
 
@@ -909,27 +935,25 @@
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
-            localStorage.setItem('is_admin_active', 'false');
+            // ELIMINADO: localStorage.setItem... (Seguridad)
             toggleAdminForms(false);
             alert("Modo Admin: DESACTIVADO");
             refreshActiveViews();
-            updateUserUI(); // Refresco visual inmediato
-            initSocialFeed(); // Quitar botones de borrar del muro
+            updateUserUI(); 
+            initSocialFeed(); 
             return;
         }
         const pass = prompt("🔒 Contraseña Admin:");
-        if (pass === 'admin123') { 
+        if (pass === 'rapers275dk') { 
             isAdminMode = true;
-            localStorage.setItem('is_admin_active', 'true');
+            // ELIMINADO: localStorage.setItem... (Seguridad)
             toggleAdminForms(true);
             alert("✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
             refreshActiveViews();
             
-            // --- CORRECCIÓN SOLICITADA: REFRESCO INSTANTÁNEO ---
-            updateUserUI();   // Fuerza la aparición de la caja de postear
-            initSocialFeed(); // Fuerza la aparición de botones de borrar/banear
+            updateUserUI();   
+            initSocialFeed(); 
             
-            // Cargar datos de update form
             if(updateConfig) {
                 document.getElementById('updStatus').value = updateConfig.status || 'off';
                 document.getElementById('updTitleInput').value = updateConfig.title || '';
@@ -1023,7 +1047,6 @@
         
         refreshActiveViews();
         
-        // EFECTOS Y ROBOT
         if(id === 'videos') {
             startRain(); 
             updateVideoUploadUI();
@@ -1040,12 +1063,10 @@
         if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
     }
 
-    // ROBOT DE USUARIOS
     function startUserCounter() {
         const el = document.getElementById('live-user-count');
         if(!el) return;
         el.innerText = Math.floor(Math.random() * (12 - 4 + 1) + 4);
-        
         if(robotInterval) clearInterval(robotInterval);
         robotInterval = setInterval(() => {
             const count = Math.floor(Math.random() * (15 - 4 + 1) + 4);
@@ -1075,6 +1096,13 @@
 
     function renderLibrary(id, books) {
         const c = document.getElementById(id); c.innerHTML = '';
+
+        // --- CORRECCIÓN: ESTADO DE CARGA ---
+        if(isLoading) {
+            c.innerHTML = '<div class="loading-container"><div class="spinner"></div><span>Conectando con la nube...</span></div>';
+            return;
+        }
+
         if(!books.length) { c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#777">Vacío</p>'; return; }
 
         for(let i=0; i<books.length; i+=3) {
@@ -1118,7 +1146,6 @@
             const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
             const card = document.createElement('div'); card.className = 'video-card';
             
-            // Botones Admin (CONTROL TOTAL)
             let adminBtns = '';
             if(isAdminMode) {
                 adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
@@ -1127,13 +1154,11 @@
                 </div>`;
             }
 
-            // Datos del uploader
             let uploaderHtml = '';
             let avatarDisplay = v.uploaderAvatar || '👤';
             let nameDisplay = v.uploaderName || 'Anónimo';
             let badge = '';
 
-            // Si el nombre es ADMINISTRADOR, poner Escudo
             if(nameDisplay === 'ADMINISTRADOR') {
                 avatarDisplay = '🛡️';
                 badge = '<span class="admin-badge">ADMIN</span>';
@@ -1198,7 +1223,6 @@
     /* === 8. LÓGICA AVANZADA: AUTH, PERFIL Y MURO SOCIAL === */
     /* ================================================================= */
 
-    /* --- A. AUTH & GESTIÓN DE PERFIL (ONBOARDING) --- */
     window.loginWithGoogle = async () => {
         try { 
             const provider = new GoogleAuthProvider(); 
@@ -1214,12 +1238,10 @@
         window.location.reload(); 
     };
 
-    // MONITOR DE ESTADO
     onAuthStateChanged(auth, async (user) => {
         window.currentUser = user; 
         
         if (user) {
-            // 1. USUARIO AUTENTICADO -> VERIFICAR PERFIL EN DB
             const userRef = doc(db, "usuarios", user.uid);
             const userSnap = await getDoc(userRef);
 
@@ -1234,26 +1256,23 @@
                 document.getElementById('profile-setup-modal').style.display = 'flex';
             }
         } else {
-            updateUserUI(); // Actualizar UI incluso si no hay usuario (para caso Admin)
+            updateUserUI();
         }
 
         updateVideoUploadUI();
         initSocialFeed();
     });
 
-    // --- CORRECCIÓN SOLICITADA: INTERFAZ SOCIAL (PRIORIDAD ADMIN) ---
     function updateUserUI() {
         const loginPrompt = document.getElementById('feed-login-prompt');
         const createPostCard = document.getElementById('create-post-container');
 
-        // Si es Admin, siempre puede postear. Si no, necesita usuario y perfil.
         const canPost = isAdminMode || (window.currentUser && window.currentUserProfile);
 
         if (canPost) {
             loginPrompt.style.display = 'none';
             createPostCard.style.display = 'block';
 
-            // Si es Admin puro (sin login de google), forzar identidad visual en la caja
             if (isAdminMode && !window.currentUserProfile) {
                 document.getElementById('user-name-display').innerText = "ADMINISTRADOR";
                 document.getElementById('user-avatar-display').innerText = "🛡️";
@@ -1262,7 +1281,6 @@
                 document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
             }
         } else {
-            // Si NO es admin y NO tiene usuario logueado, mostrar login
             loginPrompt.style.display = 'block';
             createPostCard.style.display = 'none';
         }
@@ -1270,7 +1288,6 @@
         updateVideoUploadUI();
     }
 
-    // A.1 FUNCIONES DE PERFIL
     window.selectAvatar = (emoji, el) => {
         document.querySelectorAll('.avatar-option').forEach(d => d.classList.remove('selected'));
         el.classList.add('selected');
@@ -1321,7 +1338,6 @@
     window.updateVideoUploadUI = function() {
         const btnContainer = document.getElementById('btn-show-video-form');
         if (!btnContainer) return;
-        // Mostrar botón si es Admin O si es Usuario Registrado
         if (isAdminMode || window.currentUserProfile) {
             btnContainer.style.display = 'block';
         } else {
@@ -1349,7 +1365,6 @@
 
         let uploaderName, uploaderAvatar, uploaderUid;
 
-        // --- Lógica de identidad Admin en Videos ---
         if (isAdminMode) {
             uploaderName = "ADMINISTRADOR";
             uploaderAvatar = "🛡️"; 
@@ -1407,7 +1422,6 @@
                 const userLiked = window.currentUser && likes.includes(window.currentUser.uid);
                 const userDisagreed = window.currentUser && disagrees.includes(window.currentUser.uid);
 
-                // BOTONES ADMIN (BORRAR / BANEAR)
                 let adminControls = '';
                 if (isAdminMode) {
                     adminControls = `
@@ -1416,7 +1430,6 @@
                     `;
                 }
 
-                // Badge Admin en Posts
                 let badge = '';
                 if(post.authorName === 'ADMINISTRADOR') {
                     badge = '<span class="admin-badge">ADMIN</span>';
@@ -1467,7 +1480,6 @@
 
     /* --- D. ACCIONES SOCIALES --- */
     
-    // --- CORRECCIÓN SOLICITADA: PUBLICAR COMO ADMIN ---
     window.createPost = async () => {
         let title = document.getElementById('postTitle').value.trim();
         let text = document.getElementById('postBody').value.trim();
@@ -1475,14 +1487,12 @@
 
         let pName, pAvatar, pUid;
 
-        // PRIORIDAD ADMIN
         if (isAdminMode) {
             pName = "ADMINISTRADOR";
             pAvatar = "🛡️";
             pUid = "admin_system";
         } 
         else {
-            // Usuario Normal
             if(!window.currentUserProfile) return alert("Error de perfil.");
             if(window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
             pName = window.currentUserProfile.nickname;
@@ -1575,7 +1585,6 @@
 
         let cName, cAvatar, cUid;
 
-        // Soporte Admin en Comentarios
         if (isAdminMode) {
             cName = "ADMINISTRADOR";
             cAvatar = "🛡️";
@@ -1615,11 +1624,24 @@
         showModal("Notas Guardadas", "Tus notas están seguras.");
     };
 
+    /* --- DETECTOR DE INTERNET (NUEVO) --- */
+    function updateOnlineStatus() {
+        const banner = document.getElementById('offline-indicator');
+        if(navigator.onLine) {
+            banner.style.display = 'none';
+        } else {
+            banner.style.display = 'flex';
+        }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // Chequeo inicial
+
     /* --- H. INICIO --- */
     navigate('recientes');
     if(isAdminMode) {
         toggleAdminForms(true);
-        updateUserUI(); // Asegurar estado al cargar si ya era admin
+        updateUserUI(); 
     }
 
 </script>
